@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "author": "Cleber Lourenço Izidoro",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 9.6, "left": 24.04, "attrs": {} },
+    {
+      "type": "wokwi-rgb-led",
+      "id": "rgb1",
+      "top": -24.8,
+      "left": 183.5,
+      "attrs": { "common": "cathode" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 71.15,
+      "left": 172.8,
+      "rotate": 90,
+      "attrs": { "value": "1000" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 25.4,
+      "left": -86.4,
+      "attrs": { "color": "green", "xray": "1" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 92.6,
+      "left": -86.4,
+      "attrs": { "color": "green", "xray": "1" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "rgb1:COM", "r1:1", "green", [ "v0" ] ],
+    [ "r1:2", "esp:GND.1", "black", [ "h-0.55", "v134.05", "h-201.6", "v-76.8" ] ],
+    [ "rgb1:R", "esp:19", "green", [ "v0" ] ],
+    [ "rgb1:G", "esp:18", "green", [ "v0" ] ],
+    [ "esp:5", "rgb1:B", "green", [ "h0" ] ],
+    [ "btn1:1.r", "esp:32", "green", [ "v9.6", "h19.4", "v48" ] ],
+    [ "btn2:1.r", "esp:33", "green", [ "v0" ] ],
+    [ "esp:GND.1", "btn2:2.l", "black", [ "h-134.25", "v-38.4" ] ],
+    [ "btn2:2.l", "btn1:2.l", "black", [ "h-19.2", "v-57.4" ] ]
+  ],
+  "dependencies": {}
+}
