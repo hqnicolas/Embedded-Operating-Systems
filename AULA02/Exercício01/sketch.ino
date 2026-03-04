@@ -19,24 +19,26 @@ class EntradaDigital {
       }
   };
   
-  // Criando os Objetos C=
-  EntradaDigital botao1(32);
-  EntradaDigital botao2(33);
+  #include "entradaDigital.h"
+
+  // Criando objetos
+  entradaDigital botao1(32);
+  entradaDigital botao2(33);
   
   void setup() {
     Serial.begin(9600);
-    // Chamando os métodos de cada objeto
     botao1.iniciar();
     botao2.iniciar();
   }
   
   void loop() {
-    if (botao1.pressionado()) {
-      Serial.println("Botão 1 ativo!");
+  
+    if (botao1.pulso()) {
+      Serial.println("Botão 1 pressionado (pulso)!");
     }
-    
-    if (botao2.pressionado()) {
-      Serial.println("Botão 2 ativo!");
+  
+    if (botao2.pulso()) {
+      Serial.println("Botão 2 pressionado (pulso)!");
     }
-    delay(100);
+  
   }
