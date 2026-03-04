@@ -13,8 +13,8 @@ Quando trabalhamos com circuitos que envolvem **chaves mecânicas**, surge um fe
 * Problemas de leitura em circuitos digitais que esperam apenas uma transição de estado.
 
 
+<img width="822" height="222" alt="image" src="https://github.com/user-attachments/assets/ec7c04f4-af58-4f49-af5d-ae8310dc3fb4" />
 
-> **[Inserir Imagem: Gráfico do efeito bouncing mostrando as oscilações de sinal entre 0V e 5V no momento do acionamento]**
 
 ---
 
@@ -30,8 +30,8 @@ Para ler chaves mecânicas, utilizam-se comumente resistores para garantir níve
 * **Resistor de Pull-Down:** Conecta o pino ao Terra (0V). Quando a chave é pressionada, o pino recebe o sinal do VCC (5V).
 
 
+<img width="448" height="298" alt="image" src="https://github.com/user-attachments/assets/66b84835-23b8-4b4f-bf59-bebcf93512e7" />
 
-> **[Inserir Imagem: Esquema elétrico comparativo entre circuito Pull-Up e Pull-Down]**
 
 ---
 
@@ -51,8 +51,8 @@ Consiste no uso de componentes passivos, como capacitores, para suavizar a trans
 **Limitação:** Auxilia no problema, mas não o resolve com precisão extrema.
 
 
+<img width="194" height="327" alt="image" src="https://github.com/user-attachments/assets/84616ec2-0140-4aca-81cf-c7ac052cd590" />
 
-> **[Inserir Imagem: Esquema de circuito com capacitor de filtro (C1) e resistor (R1)]**
 
 ### Filtro Digital (Software)
 
