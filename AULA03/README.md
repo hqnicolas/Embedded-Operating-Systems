@@ -32,8 +32,6 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 * Por serem muito rápidos e eficientes, muitos circuitos integrados hoje em dia utilizam apenas um conversor paralelo para mais de uma entrada analógica. 
 
-
-
 ---
 
 ## Conversão SAR - Aproximação Sucessiva
@@ -47,7 +45,6 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 
 * Ocupa pouco espaço e tem um baixo consumo de energia. 
-
 
 
 ---
