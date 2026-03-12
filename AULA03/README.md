@@ -1,12 +1,5 @@
 # Aula 03: Entradas e Saídas Analógicas – Porta Serial
 
-**Disciplina:** IoT Aplicada
-
-**Professor:** Me. Cleber Lourenço Izidoro
-
-**Instituição:** Centro Universitário UNISATC – Engenharia de Computação
-
-
 ---
 
 ## Tipos de Entradas Analógicas
@@ -28,6 +21,8 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 * Também chamado de conversor paralelo ou conversor flash; 
 
+<img width="617" height="551" alt="image" src="https://github.com/user-attachments/assets/6d9d40b6-3958-40e4-b847-d422b47b6927" />
+
 
 * Possui uma tensão de referência e diversos comparadores de tensão para obter a tensão de saída; 
 
@@ -44,6 +39,9 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 ## Conversão SAR - Aproximação Sucessiva
 
 
+<img width="816" height="361" alt="image" src="https://github.com/user-attachments/assets/3e427960-41ad-4b6a-b9cd-1cf6d16a8e68" />
+
+
 
 * Necessita de processamento para efetuar a conversão; 
 
@@ -56,7 +54,12 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 ## Conversão SAR – Funcionamento (Passo 1)
 
+<img width="862" height="414" alt="image" src="https://github.com/user-attachments/assets/9a6a2189-fd01-4646-98d1-bd429dc3f248" />
+
+
 * Primeiro, o ADC SAR rastreia o valor da entrada analógica; 
+
+<img width="941" height="484" alt="image" src="https://github.com/user-attachments/assets/07ee0af2-7e56-47ac-8533-f17a303e3aa6" />
 
 
 * Cada ADC SAR terá um tempo mínimo de rastreamento; 
@@ -72,6 +75,7 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 * A entrada analógica é amostrada e mantida durante o processo de conversão. 
 
+<img width="883" height="466" alt="image" src="https://github.com/user-attachments/assets/e2295271-ce07-4abb-8c8e-377ab1b93c95" />
 
 
 ---
@@ -100,11 +104,12 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 * O resultado final de 4 bits é publicado e o ADC retorna ao rastreamento do sinal de entrada (Etapa 1). 
 
 
-
-
 ---
 
 ## Conversão Delta-Sigma
+
+<img width="717" height="420" alt="image" src="https://github.com/user-attachments/assets/734e93c1-d391-4bcf-81a6-e82681fabb5a" />
+
 
 * Um projeto ADC mais recente é o ADC Delta-Sigma (ou conversor delta), que aproveita a tecnologia DSP para melhorar a resolução do eixo de amplitude e reduzir o ruído de quantização de alta frequência inerente aos projetos SAR. 
 
@@ -113,6 +118,9 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 ---
 
 ## ESP32 - Entrada Analógica
+
+<img width="727" height="460" alt="image" src="https://github.com/user-attachments/assets/52dfd633-981f-4387-985c-dd469b50c421" />
+
 
 * O ESP32 possui 2x12bit SAR (Sucessive Approximation Register) que pode ler 18 diferentes pinos de entrada analógica divididos em 8 canais do ADC1 e 10 canais do ADC2. 
 
@@ -131,6 +139,9 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 ## ESP32 – Atenuação ADC
 
+<img width="1288" height="353" alt="image" src="https://github.com/user-attachments/assets/615744d0-0054-4bb6-b601-8a4d615381a9" />
+
+
 * É possível modificar a atenuação do conversor ADC. 
 
 
@@ -145,10 +156,15 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 ## ESP32 – Resolução ADC
 
+<img width="883" height="231" alt="image" src="https://github.com/user-attachments/assets/263b0149-0fe6-4a0d-af08-ed728dc08ef1" />
+
+
 * O ESP32 possui um conversor ADC com resolução programável. 
 
 
 * A resolução padrão é de 12 bits (o que dá leituras de 0 – 4095). 
+
+<img width="815" height="127" alt="image" src="https://github.com/user-attachments/assets/9bcd1147-aaa7-42fc-8b2d-0796069b3bac" />
 
 
 * No entanto, pode-se alterar para resoluções de 9, 10 ou 11 bits através da função do Core do Arduino: `analogReadResolution(resolução)`. 
@@ -175,6 +191,9 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 
 ## ESP32 – Linearidade ADC
 
+<img width="708" height="384" alt="image" src="https://github.com/user-attachments/assets/e3d80e06-8fd1-469a-af8b-bb2c16b5fe57" />
+
+
 * Um ADC ideal deve ter uma resposta linear conforme representa a curva na cor azul da figura abaixo. 
 
 
@@ -188,6 +207,9 @@ Os microcontroladores, em geral, podem possuir diferentes circuitos para efetuar
 ---
 
 ## ESP32 - Saída Analógica (DAC)
+
+<img width="639" height="448" alt="image" src="https://github.com/user-attachments/assets/b43d8f16-040d-4913-9f07-a41532f626c7" />
+
 
 * DAC significa Digital-to-Analog Converter. 
 
