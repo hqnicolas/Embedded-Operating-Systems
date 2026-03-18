@@ -1,18 +1,52 @@
-Utilizando C++ no ESP32 Desenvolva a tividade abaixo:
-Um estacionamento de carros possui apenas um portão para a entrada e saida de automóveis.
-Seu proprietário pretende instalar um sistema de informação luminosa de liberação ou impedimento de passagem e um portão automatico que abre ou fecha segundo as condições á seguir:
-sensor de carro aguardando para entrar,
-sensor de carro entrando,
-display 7seg.
-Vaga 1
-Vaga 2
-Vaga 3
-Vaga 4
-Vaga 5
-O portão deverá abrir sempre que houver carro querendo entrar, somente fechando quando sair do sensor interno, e abre quando estiver querendo sair,
-somente fechando quando sair do sensor externo desacionar.
+# Sistema de Estacionamento Inteligente para ESP32
 
-A cada carro que passar primeiro no sensor de externo e após no sensor interno,
-o contador e vagas deverá decrementar em uma unidade, e quando chegar a zero vagas, não pode mais abrir o portão para entrada
+## Descrição do Projeto
+Este projeto implementa um sistema de controle de acesso para um estacionamento de carros com um único portão de entrada e saída, utilizando um ESP32. O sistema gerencia o fluxo de veículos, exibe o número de vagas disponíveis em um display de 7 segmentos e controla a abertura/fechamento do portão com base na ocupação e nos sensores de presença de carros.
 
-Considere uma saida para abrir e outra para fechar, e, que o controle do portão é feito de forma independente por um hardware interno.
+## Funcionalidades
+*   **Controle de Portão Automático:**
+    *   O portão abre para a entrada quando um carro é detectado pelo sensor externo.
+    *   O portão fecha para a entrada somente após o carro sair do sensor interno.
+    *   O portão abre para a saída quando um carro é detectado pelo sensor interno (querendo sair).
+    *   O portão fecha para a saída somente após o carro sair do sensor externo.
+*   **Contagem de Vagas:**
+    *   O sistema monitora e atualiza o número de vagas disponíveis.
+    *   Inicia com 5 vagas disponíveis.
+    *   Decrementa uma vaga quando um carro entra (passa pelo sensor externo e depois pelo interno).
+    *   Incrementa uma vaga quando um carro sai (passa pelo sensor interno e depois pelo externo).
+*   **Indicação Luminosa:**
+    *   LEDs indicam o estado de abertura (`ABRE`) ou fechamento (`FECHA`) do portão.
+*   **Display de 7 Segmentos:**
+    *   Exibe o número atual de vagas disponíveis.
+*   **Restrição de Entrada:**
+    *   Quando o número de vagas chega a zero, o portão não abrirá mais para entrada de carros.
+
+## Hardware Utilizado
+*   **Microcontrolador:** ESP32
+*   **Sensores de Carro:**
+    *   Sensor de carro aguardando para entrar (Sensor Externo)
+    *   Sensor de carro entrando (Sensor Interno)
+*   **Display:** Display de 7 segmentos
+*   **Indicadores Visuais:** LEDs para `ABRE` e `FECHA`
+*   **Portão Automático:** Considerado um hardware interno independente, com entradas para "abrir" e "fechar".
+
+## Pinagem do ESP32
+
+### Sensores de Carro
+*   **Sensor Interno:** `GPIO14` (HIGH = carro detectado, LOW = sem carro)
+*   **Sensor Externo:** `GPIO12` (HIGH = carro detectado, LOW = sem carro)
+
+### LEDs de Indicação do Portão
+*   **LED ABRIR Portão:** `GPIO26`
+*   **LED FECHAR Portão:** `GPIO27`
+
+### Display de 7 Segmentos
+| Segmento | Pino ESP32 |
+| :------- | :--------- |
+| A        | `GPIO18`   |
+| B        | `GPIO19`   |
+| C        | `GPIO0`    |
+| D        | `GPIO4`    |
+| E        | `GPIO16`   |
+| F        | `GPIO5`    |
+| G        | `GPIO17`   |
