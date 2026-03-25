@@ -186,11 +186,8 @@ Documentação oficial: https://www.freertos.org
 | Categoria | Funções |
 | :--- | :--- |
 | **Controle do Kernel** | `vTaskStartScheduler()`, `vTaskEndScheduler()`, `vTaskSuspendAll()`, `xTaskResumeAll()` |
-| **Criação/Deleção** | `xTaskCreate()`, `vTaskDelete()` |
-| **Controle de Task** | `vTaskDelay()`, `vTaskDelayUntil()`, `vTaskPrioritySet()`, `vTaskSuspend()`, `vTaskResume()` |
-| **Filas (Queues)** | `xQueueCreate()`, `xQueueSend()`, `xQueueReceive()`, `xQueuePeek()` |
-| **Semáforos** | `vSemaphoreCreateBinary()`, `xSemaphoreCreateMutex()`, `xSemaphoreTake()`, `xSemaphoreGive()` |
-
----
-
-**Fim do Documento**
+| **Criação e Remoção de Tasks** | `xTaskCreate()`, `vTaskDelete()` |
+| **Gerenciamento de Tasks** | `vTaskDelay()`, `vTaskDelayUntil()`, `uxTaskPriorityGet()`, `vTaskPrioritySet()`, `vTaskSuspend()`, `vTaskResume()`, `xTaskResumeFromISR()`, `vTaskSetApplicationTag()`, `xTaskCallApplicationTaskHook()` |
+| **Informações e Monitoramento de Tasks** | `xTaskGetCurrentTaskHandle()`, `xTaskGetSchedulerState()`, `uxTaskGetNumberOfTasks()`, `vTaskList()`, `vTaskStartTrace()`, `ulTaskEndTrace()`, `vTaskGetRunTimeStats()` |
+| **Filas (Queues)** | `xQueueCreate()`, `xQueueSend()`, `xQueueReceive()`, `xQueuePeek()`, `xQueueSendFromISR()`, `xQueueSendToBackFromISR()`, `xQueueSendToFrontFromISR()`, `xQueueReceiveFromISR()`, `vQueueAddToRegistry()`, `vQueueUnregisterQueue()` |
+| **Semáforos e Mutex** | `vSemaphoreCreateBinary()`, `vSemaphoreCreateCounting()`, `xSemaphoreCreateMutex()`, `xSemaphoreTake()`, `xSemaphoreGive()`, `xSemaphoreGiveFromISR()` |
