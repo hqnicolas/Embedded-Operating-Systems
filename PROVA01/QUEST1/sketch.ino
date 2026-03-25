@@ -15,16 +15,16 @@ const int LED_ABRE_PORTAO_PIN = 26;
 const int LED_FECHA_PORTAO_PIN = 27;
 
 const byte numeros[10][7] = {
-  {1, 1, 1, 1, 1, 1, 0},
-  {0, 1, 1, 0, 0, 0, 0},
-  {1, 1, 0, 1, 1, 0, 1},
-  {1, 1, 1, 1, 0, 0, 1},
-  {0, 1, 1, 0, 0, 1, 1},
-  {1, 0, 1, 1, 0, 1, 1},
-  {1, 0, 1, 1, 1, 1, 1},
-  {1, 1, 1, 0, 0, 0, 0},
-  {1, 1, 1, 1, 1, 1, 1},
-  {1, 1, 1, 1, 0, 1, 1}
+  {1,1,1,1,1,1,0},
+  {0,1,1,0,0,0,0},
+  {1,1,0,1,1,0,1},
+  {1,1,1,1,0,0,1},
+  {0,1,1,0,0,1,1},
+  {1,0,1,1,0,1,1},
+  {1,0,1,1,1,1,1},
+  {1,1,1,0,0,0,0},
+  {1,1,1,1,1,1,1},
+  {1,1,1,1,0,1,1}
 };
 
 Sensor sensorInterno(SENSOR_INTERNO_PIN);
@@ -33,31 +33,20 @@ LED ledAbrirPortao(LED_ABRE_PORTAO_PIN);
 LED ledFecharPortao(LED_FECHA_PORTAO_PIN);
 
 const int TOTAL_VAGAS = 5;
-int TemVaga = TOTAL_VAGAS;
-
-enum EstadoPortao {
-  FECHADO,
-  ABERTO_ENTRADA,
-  ABERTO_SAIDA
-};
-
-EstadoPortao estadoAtualPortao = FECHADO;
+int vagasDisponiveis = TOTAL_VAGAS;
 
 enum EstadoSistema {
   AGUARDANDO,
-  ABRINDO_ENTRADA,
-  CARRO_ENTRANDO,
-  FECHANDO_ENTRADA,
-  ABRINDO_SAIDA,
-  CARRO_SAINDO,
-  FECHANDO_SAIDA
+  ENTRANDO_1,
+  ENTRANDO_2,
+  SAINDO_1,
+  SAINDO_2
 };
 
-EstadoSistema estadoAtualSistema = AGUARDANDO;
+EstadoSistema estado = AGUARDANDO;
 
 void atualizarDisplay(int n) {
-  if (n < 0) n = 0;
-  if (n > 9) n = 9;
+  n = constrain(n, 0, 9);
 
   digitalWrite(pinoA, numeros[n][0]);
   digitalWrite(pinoB, numeros[n][1]);
@@ -68,22 +57,14 @@ void atualizarDisplay(int n) {
   digitalWrite(pinoG, numeros[n][6]);
 }
 
-void abrirPortaoEntrada() {
+void abrirPortao() {
   ledAbrirPortao.ligar();
   ledFecharPortao.desligar();
-  estadoAtualPortao = ABERTO_ENTRADA;
-}
-
-void abrirPortaoSaida() {
-  ledAbrirPortao.ligar();
-  ledFecharPortao.desligar();
-  estadoAtualPortao = ABERTO_SAIDA;
 }
 
 void fecharPortao() {
   ledAbrirPortao.desligar();
   ledFecharPortao.ligar();
-  estadoAtualPortao = FECHADO;
 }
 
 void setup() {
@@ -94,68 +75,62 @@ void setup() {
   pinMode(pinoE, OUTPUT);
   pinMode(pinoF, OUTPUT);
   pinMode(pinoG, OUTPUT);
-  atualizarDisplay(TemVaga);
-  estadoAtualPortao = FECHADO;
+
+  pinMode(SENSOR_INTERNO_PIN, INPUT);
+  pinMode(SENSOR_EXTERNO_PIN, INPUT);
+
+  atualizarDisplay(vagasDisponiveis);
+  fecharPortao();
 }
 
 void loop() {
-  bool carroExterno = sensorExterno.readState();
-  bool carroInterno = sensorInterno.readState();
+  bool ext = sensorExterno.readState();
+  bool intl = sensorInterno.readState();
 
-  switch (estadoAtualSistema) {
+  switch (estado) {
 
     case AGUARDANDO:
-      if (carroExterno && TemVaga > 0) {
-        abrirPortaoEntrada();
-        estadoAtualSistema = ABRINDO_ENTRADA;
+      if (ext && vagasDisponiveis > 0) {
+        abrirPortao();
+        estado = ENTRANDO_1;
       }
-      else if (carroInterno && !carroExterno) {
-        abrirPortaoSaida();
-        estadoAtualSistema = ABRINDO_SAIDA;
-      }
-      break;
-
-    case ABRINDO_ENTRADA:
-      if (carroInterno) {
-        estadoAtualSistema = CARRO_ENTRANDO;
+      else if (intl) {
+        abrirPortao();
+        estado = SAINDO_1;
       }
       break;
 
-    case CARRO_ENTRANDO:
-      if (!carroInterno) {
-        estadoAtualSistema = FECHANDO_ENTRADA;
+    case ENTRANDO_1:
+      if (intl) {
+        estado = ENTRANDO_2;
       }
       break;
 
-    case FECHANDO_ENTRADA:
-      if (!carroExterno) {
-        TemVaga--;
+    case ENTRANDO_2:
+      if (!ext && !intl) {
+        vagasDisponiveis--;
+        vagasDisponiveis = constrain(vagasDisponiveis, 0, TOTAL_VAGAS);
         fecharPortao();
-        estadoAtualSistema = AGUARDANDO;
+        estado = AGUARDANDO;
       }
       break;
 
-    case ABRINDO_SAIDA:
-      if (carroExterno) {
-        estadoAtualSistema = CARRO_SAINDO;
+    case SAINDO_1:
+      if (ext) {
+        estado = SAINDO_2;
       }
       break;
 
-    case CARRO_SAINDO:
-      if (!carroExterno) {
-        estadoAtualSistema = FECHANDO_SAIDA;
-      }
-      break;
-
-    case FECHANDO_SAIDA:
-      if (!carroInterno) {
-        TemVaga++;
+    case SAINDO_2:
+      if (!ext && !intl) {
+        vagasDisponiveis++;
+        vagasDisponiveis = constrain(vagasDisponiveis, 0, TOTAL_VAGAS);
         fecharPortao();
-        estadoAtualSistema = AGUARDANDO;
+        estado = AGUARDANDO;
       }
       break;
   }
 
-  atualizarDisplay(TemVaga);
-  delay(100);
+  atualizarDisplay(vagasDisponiveis);
+  delay(50);
 }
