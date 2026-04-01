@@ -23,8 +23,12 @@ Repository contendo exercícios e atividades práticas com microcontroladores ES
 - [Exercício03](./AULA04/Exercício03) – Exemplo de Timer
 - [Material de Apoio](./AULA04/MATERIAL_DE_APOIO.md)
 
-### PROVA01 - Avaliação Prática
-- [QUEST1](./PROVA01/QUEST1/) – Sensor e LED com classes customizadas
-- [QUEST2](./PROVA01/QUEST2/) – Sistema de Alarme com Sensor de Nível
+### AULA05 - FreeRTOS no ESP32
+- [Exemplo1](./AULA05/Exemplo1) – Criação de tasks no FreeRTOS
+- [Exemplo2](./AULA05/Exemplo2) – Execução de múltiplas tasks com controle de LED
+- [Exercicio01](./AULA05/Exercicio01) – Leitura analógica e controle de tasks com suspensão/retomada
 
+### AULA06 - Comunicação entre Tasks
+- [README](./AULA06/README.md) – Passagem de parâmetros para tasks usando ponteiros (`void *`) e `xTaskCreate`
 
+---
