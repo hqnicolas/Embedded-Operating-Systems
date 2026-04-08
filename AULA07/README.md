@@ -3,11 +3,17 @@
 ## 1. Comunicação entre Tarefas
 Em sistemas multitarefa como o FreeRTOS, é essencial haver uma forma de comunicação para a troca de dados entre as tarefas.
 
+<img width="736" height="314" alt="image" src="https://github.com/user-attachments/assets/bdbdc9c3-d471-4136-849e-0a8b7c3b4058" />
+
+
 ### Abordagem com Variável Global
 * Uma forma simples é usar uma variável global para escrita e leitura pelas tarefas.
 * **Problema:** Em sistemas preemptivos, o SO pode interromper uma tarefa a qualquer momento para dar tempo de processamento a outra.
 * Como a escrita/leitura de uma variável global geralmente envolve várias instruções assembly, a interrupção pode ocorrer durante esse processo, resultando em dados inconsistentes ou incompletos.
 * Se outra tarefa ler esses dados, o resultado será imprevisível e provavelmente incorreto.
+
+<img width="740" height="345" alt="image" src="https://github.com/user-attachments/assets/81f36aae-fb3e-4fb0-a198-19469dfa1798" />
+
 
 ### Comunicação *Thread Safe*
 * Mecanismos que evitam problemas de inconsistência são chamados de *thread safe*.
@@ -21,6 +27,9 @@ Em sistemas multitarefa como o FreeRTOS, é essencial haver uma forma de comunic
 
 ## 2. Filas (Queues)
 As filas são estruturas de dados do tipo **FIFO** (*first-in first-out*), onde o primeiro elemento adicionado é o primeiro a ser removido.
+
+<img width="898" height="243" alt="image" src="https://github.com/user-attachments/assets/26544081-56bd-4abd-b751-1facf855c99e" />
+
 
 * São o principal meio de comunicação entre tarefas e interrupções no FreeRTOS.
 * Funcionam tanto para troca de mensagens quanto como mecanismo de sincronização.
