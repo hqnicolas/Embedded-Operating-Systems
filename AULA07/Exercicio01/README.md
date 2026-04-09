@@ -30,15 +30,9 @@ Uma tarefa faz a leitura contínua do potenciômetro e envia os valores para uma
 - Tensão equivalente em volts
 - Percentual aproximado da posição do potenciômetro
 
-## Arquivo Principal
-O código da atividade está em [sketch.ino](/c:/Users/nicolas.337911/Downloads/Embedded-Operating-Systems/AULA02/Exercício01/sketch.ino).
-
 ## Exemplo de saída serial
 ```text
 ADC: 0 | Tensao: 0.00 V | Potenciometro: 0.0%
 ADC: 2048 | Tensao: 1.65 V | Potenciometro: 50.0%
 ADC: 4095 | Tensao: 3.30 V | Potenciometro: 100.0%
 ```
-
-## Observação
-Os arquivos `entradaDigital.h` e `entradaDigital.cpp` permaneceram na pasta, mas não são utilizados nesta implementação.
