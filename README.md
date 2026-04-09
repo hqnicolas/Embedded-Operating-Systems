@@ -4,7 +4,7 @@ Repository contendo exercícios e atividades práticas com microcontroladores ES
 
 ---
 
-## 📚 Conteúdo
+## Conteúdo
 
 ### AULA01 - Atividades com ESP32 / Arduino
 - [Exercício01](./AULA01/Exercício01) – Controle de LED RGB
@@ -30,5 +30,10 @@ Repository contendo exercícios e atividades práticas com microcontroladores ES
 
 ### AULA06 - Comunicação entre Tasks
 - [README](./AULA06/README.md) – Passagem de parâmetros para tasks usando ponteiros (`void *`) e `xTaskCreate`
+
+### AULA07 - Filas no FreeRTOS
+- [README](./AULA07/README.md) – Introdução e funções de manipulação de filas
+- [Exercicio01](./AULA07/Exercicio01) – Comunicação entre tarefas com fila
+- [Exercicio02](./AULA07/Exercicio02) – Display de 7 segmentos com multiplexação e fila
 
 ---
