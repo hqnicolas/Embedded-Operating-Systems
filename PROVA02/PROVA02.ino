@@ -1,7 +1,9 @@
-###########################
-# NATHAN DA SILVA FELIPE
-# NICOLAS BORBA PEREIRA
-###########################
+/* 
+   ###########################
+   # NATHAN DA SILVA FELIPE
+   # NICOLAS BORBA PEREIRA
+   ###########################
+*/
 
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
@@ -75,8 +77,6 @@ void escreverDigito(uint8_t digito, bool pontoDecimal);
 void exibirNumeroMux(uint8_t numero, bool pontoDecimal);
 
 void setup() {
-  analogReadResolution(12);
-
   pinMode(ldr, INPUT);
   pinMode(led, OUTPUT);
   pinMode(rele, OUTPUT);
