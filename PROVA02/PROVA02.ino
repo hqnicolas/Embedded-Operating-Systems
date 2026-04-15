@@ -1,3 +1,8 @@
+###########################
+# NATHAN DA SILVA FELIPE
+# NICOLAS BORBA PEREIRA
+###########################
+
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -19,7 +24,8 @@ static const uint8_t g = 22;
 static const uint8_t ponto = 19;
 static const uint8_t display_dezena = 16;
 static const uint8_t display_unidade = 17;
-static const uint16_t ldr_maximo = 4095;
+static const uint16_t mini_calibrado = 820;
+static const uint16_t max_calibrado = 2335;
 static const uint8_t setpoint = 50;
 static const uint8_t histerese = 5;
 static const TickType_t debounce = pdMS_TO_TICKS(50);
@@ -42,8 +48,8 @@ const uint8_t pinosSegmentos[8] = {
 };
 
 struct DadosLuminosidade {
-  uint16_t leituraADC;
-  uint8_t luminosidadePercentual;
+  uint16_t leituraDaPorta;
+  uint8_t Percentual;
 };
 
 struct DadosDisplay {
@@ -54,7 +60,7 @@ struct DadosDisplay {
 QueueHandle_t filaControle;
 QueueHandle_t filaDisplay;
 
-volatile uint8_t valorAtualDisplay = 0;
+volatile uint8_t Display = 0;
 volatile bool pontoDecimalAtivo = false;
 
 void taskLeituraLdr(void *pvParameters);
@@ -62,6 +68,7 @@ void taskControleMenu(void *pvParameters);
 void taskDisplay(void *pvParameters);
 
 bool botaoPressionado(uint8_t pinoBotao);
+uint8_t converter(uint16_t leituraDaPorta);
 void publicarDisplay(uint8_t valor, bool modoProgramacao);
 void apagarDisplays();
 void escreverDigito(uint8_t digito, bool pontoDecimal);
@@ -118,8 +125,8 @@ void taskLeituraLdr(void *pvParameters) {
 
   while (true) {
     DadosLuminosidade amostra;
-    amostra.leituraADC = analogRead(ldr);
-    amostra.luminosidadePercentual = static_cast<uint8_t>(map(amostra.leituraADC, 0, ldr_maximo, 0, 100));
+    amostra.leituraDaPorta = analogRead(ldr);
+    amostra.Percentual = converter(amostra.leituraDaPorta);
 
     xQueueOverwrite(filaControle, &amostra);
     vTaskDelay(pdMS_TO_TICKS(200));
@@ -129,7 +136,7 @@ void taskLeituraLdr(void *pvParameters) {
 void taskControleMenu(void *pvParameters) {
   (void) pvParameters;
 
-  DadosLuminosidade amostraAtual = {0, 0};
+  DadosLuminosidade Atual = {0, 0};
   uint8_t setpoint = setpoint;
   bool modoProgramacao = false;
   bool releLigado = false;
@@ -139,13 +146,13 @@ void taskControleMenu(void *pvParameters) {
   while (true) {
     DadosLuminosidade novaAmostra;
     if (xQueueReceive(filaControle, &novaAmostra, pdMS_TO_TICKS(20)) == pdTRUE) {
-      amostraAtual = novaAmostra;
+      Atual = novaAmostra;
     }
 
     if (botaoPressionado(menu)) {
       modoProgramacao = !modoProgramacao;
       digitalWrite(led, modoProgramacao ? HIGH : LOW);
-      publicarDisplay(modoProgramacao ? setpoint : amostraAtual.luminosidadePercentual, modoProgramacao);
+      publicarDisplay(modoProgramacao ? setpoint : Atual.Percentual, modoProgramacao);
     }
 
     if (modoProgramacao) {
@@ -159,15 +166,15 @@ void taskControleMenu(void *pvParameters) {
         publicarDisplay(setpoint, true);
       }
     } else {
-      if (!releLigado && amostraAtual.luminosidadePercentual <= max(0, static_cast<int>(setpoint) - histerese)) {
+      if (!releLigado && Atual.Percentual <= max(0, static_cast<int>(setpoint) - histerese)) {
         releLigado = true;
         digitalWrite(rele, HIGH);
-      } else if (releLigado && amostraAtual.luminosidadePercentual >= min(100, static_cast<int>(setpoint) + histerese)) {
+      } else if (releLigado && Atual.Percentual >= min(100, static_cast<int>(setpoint) + histerese)) {
         releLigado = false;
         digitalWrite(rele, LOW);
       }
 
-      publicarDisplay(amostraAtual.luminosidadePercentual, false);
+      publicarDisplay(Atual.Percentual, false);
     }
 
     vTaskDelay(pdMS_TO_TICKS(120));
@@ -180,11 +187,11 @@ void taskDisplay(void *pvParameters) {
 
   while (true) {
     if (xQueueReceive(filaDisplay, &dadosRecebidos, 0) == pdTRUE) {
-      valorAtualDisplay = dadosRecebidos.valor;
+      Display = dadosRecebidos.valor;
       pontoDecimalAtivo = dadosRecebidos.modoProgramacao;
     }
 
-    exibirNumeroMux(valorAtualDisplay, pontoDecimalAtivo);
+    exibirNumeroMux(Display, pontoDecimalAtivo);
   }
 }
 
@@ -202,6 +209,11 @@ bool botaoPressionado(uint8_t pinoBotao) {
   }
 
   return false;
+}
+
+uint8_t converter(uint16_t leituraDaPorta) {
+  uint16_t leituraCalibrada = constrain(leituraDaPorta, mini_calibrado, max_calibrado);
+  return static_cast<uint8_t>(map(leituraCalibrada, mini_calibrado, max_calibrado, 100, 0));
 }
 
 void publicarDisplay(uint8_t valor, bool modoProgramacao) {
