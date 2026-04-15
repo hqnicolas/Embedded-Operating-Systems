@@ -28,7 +28,7 @@ static const uint8_t display_dezena = 16;
 static const uint8_t display_unidade = 17;
 static const uint16_t mini_calibrado = 820;
 static const uint16_t max_calibrado = 2335;
-static const uint8_t setpoint = 50;
+static const uint8_t setpointInicial = 50;
 static const uint8_t histerese = 5;
 static const TickType_t debounce = pdMS_TO_TICKS(50);
 
@@ -45,6 +45,20 @@ const byte digitos7seg[10][8] = {
   {1, 1, 1, 1, 0, 1, 1, 0}
 };
 
+QueueHandle_t filaControle;
+QueueHandle_t filaDisplay;
+volatile uint8_t Display = 0;
+volatile bool pontoDecimalAtivo = false;
+void taskLeituraLdr(void *pvParameters);
+void taskControleMenu(void *pvParameters);
+void taskDisplay(void *pvParameters);
+bool botaoPressionado(uint8_t pinoBotao);
+uint8_t converter(uint16_t leituraDaPorta);
+void publicarDisplay(uint8_t valor, bool modoProgramacao);
+void apagarDisplays();
+void escreverDigito(uint8_t digito, bool pontoDecimal);
+void exibirNumeroMux(uint8_t numero, bool pontoDecimal);
+
 const uint8_t pinosSegmentos[8] = {
   a, b, c, d, e, f, g, ponto
 };
@@ -58,23 +72,6 @@ struct DadosDisplay {
   uint8_t valor;
   bool modoProgramacao;
 };
-
-QueueHandle_t filaControle;
-QueueHandle_t filaDisplay;
-
-volatile uint8_t Display = 0;
-volatile bool pontoDecimalAtivo = false;
-
-void taskLeituraLdr(void *pvParameters);
-void taskControleMenu(void *pvParameters);
-void taskDisplay(void *pvParameters);
-
-bool botaoPressionado(uint8_t pinoBotao);
-uint8_t converter(uint16_t leituraDaPorta);
-void publicarDisplay(uint8_t valor, bool modoProgramacao);
-void apagarDisplays();
-void escreverDigito(uint8_t digito, bool pontoDecimal);
-void exibirNumeroMux(uint8_t numero, bool pontoDecimal);
 
 void setup() {
   pinMode(ldr, INPUT);
@@ -105,7 +102,7 @@ void setup() {
     }
   }
 
-  publicarDisplay(setpoint, false);
+  publicarDisplay(setpointInicial, false);
 
   if (xTaskCreate(taskLeituraLdr, "LeituraLDR", 2048, NULL, 1, NULL) != pdPASS ||
       xTaskCreate(taskControleMenu, "ControleMenu", 4096, NULL, 2, NULL) != pdPASS ||
@@ -137,7 +134,7 @@ void taskControleMenu(void *pvParameters) {
   (void) pvParameters;
 
   DadosLuminosidade Atual = {0, 0};
-  uint8_t setpoint = setpoint;
+  uint8_t setpoint = setpointInicial;
   bool modoProgramacao = false;
   bool releLigado = false;
 
@@ -213,7 +210,7 @@ bool botaoPressionado(uint8_t pinoBotao) {
 
 uint8_t converter(uint16_t leituraDaPorta) {
   uint16_t leituraCalibrada = constrain(leituraDaPorta, mini_calibrado, max_calibrado);
-  return static_cast<uint8_t>(map(leituraCalibrada, mini_calibrado, max_calibrado, 100, 0));
+  return static_cast<uint8_t>(map(leituraCalibrada, mini_calibrado, max_calibrado, 99, 0));
 }
 
 void publicarDisplay(uint8_t valor, bool modoProgramacao) {
