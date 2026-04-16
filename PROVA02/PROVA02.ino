@@ -54,10 +54,10 @@ void taskControleMenu(void *pvParameters);
 void taskDisplay(void *pvParameters);
 bool botaoPressionado(uint8_t pinoBotao);
 uint8_t converter(uint16_t leituraDaPorta);
-void publicarDisplay(uint8_t valor, bool modoProgramacao);
+void JogaNoDisplay(uint8_t valor, bool modoProgramacao);
 void apagarDisplays();
 void escreverDigito(uint8_t digito, bool pontoDecimal);
-void exibirNumeroMux(uint8_t numero, bool pontoDecimal);
+void exibiroNumero(uint8_t numero, bool pontoDecimal);
 
 const uint8_t pinosSegmentos[8] = {
   a, b, c, d, e, f, g, ponto
@@ -80,7 +80,6 @@ void setup() {
   pinMode(menu, INPUT_PULLUP);
   pinMode(incrementa, INPUT_PULLUP);
   pinMode(decrementa, INPUT_PULLUP);
-
   digitalWrite(led, LOW);
   digitalWrite(rele, LOW);
 
@@ -102,7 +101,7 @@ void setup() {
     }
   }
 
-  publicarDisplay(setpointInicial, false);
+  JogaNoDisplay(setpointInicial, false);
 
   if (xTaskCreate(taskLeituraLdr, "LeituraLDR", 2048, NULL, 1, NULL) != pdPASS ||
       xTaskCreate(taskControleMenu, "ControleMenu", 4096, NULL, 2, NULL) != pdPASS ||
@@ -138,7 +137,7 @@ void taskControleMenu(void *pvParameters) {
   bool modoProgramacao = false;
   bool releLigado = false;
 
-  publicarDisplay(0, false);
+  JogaNoDisplay(0, false);
 
   while (true) {
     DadosLuminosidade novaAmostra;
@@ -149,18 +148,18 @@ void taskControleMenu(void *pvParameters) {
     if (botaoPressionado(menu)) {
       modoProgramacao = !modoProgramacao;
       digitalWrite(led, modoProgramacao ? HIGH : LOW);
-      publicarDisplay(modoProgramacao ? setpoint : Atual.Percentual, modoProgramacao);
+      JogaNoDisplay(modoProgramacao ? setpoint : Atual.Percentual, modoProgramacao);
     }
 
     if (modoProgramacao) {
       if (botaoPressionado(incrementa) && setpoint < 99) {
         setpoint++;
-        publicarDisplay(setpoint, true);
+        JogaNoDisplay(setpoint, true);
       }
 
       if (botaoPressionado(decrementa) && setpoint > 0) {
         setpoint--;
-        publicarDisplay(setpoint, true);
+        JogaNoDisplay(setpoint, true);
       }
     } else {
       if (!releLigado && Atual.Percentual <= max(0, static_cast<int>(setpoint) - histerese)) {
@@ -171,7 +170,7 @@ void taskControleMenu(void *pvParameters) {
         digitalWrite(rele, LOW);
       }
 
-      publicarDisplay(Atual.Percentual, false);
+      JogaNoDisplay(Atual.Percentual, false);
     }
 
     vTaskDelay(pdMS_TO_TICKS(120));
@@ -188,7 +187,7 @@ void taskDisplay(void *pvParameters) {
       pontoDecimalAtivo = dadosRecebidos.modoProgramacao;
     }
 
-    exibirNumeroMux(Display, pontoDecimalAtivo);
+    exibiroNumero(Display, pontoDecimalAtivo);
   }
 }
 
@@ -213,7 +212,7 @@ uint8_t converter(uint16_t leituraDaPorta) {
   return static_cast<uint8_t>(map(leituraCalibrada, mini_calibrado, max_calibrado, 99, 0));
 }
 
-void publicarDisplay(uint8_t valor, bool modoProgramacao) {
+void JogaNoDisplay(uint8_t valor, bool modoProgramacao) {
   DadosDisplay dados = {static_cast<uint8_t>(constrain(valor, 0, 99)), modoProgramacao};
   xQueueOverwrite(filaDisplay, &dados);
 }
@@ -231,7 +230,7 @@ void escreverDigito(uint8_t digito, bool pontoDecimal) {
   digitalWrite(ponto, pontoDecimal ? HIGH : LOW);
 }
 
-void exibirNumeroMux(uint8_t numero, bool pontoDecimal) {
+void exibiroNumero(uint8_t numero, bool pontoDecimal) {
   uint8_t valor = constrain(numero, 0, 99);
   uint8_t dezena = valor / 10;
   uint8_t unidade = valor % 10;
