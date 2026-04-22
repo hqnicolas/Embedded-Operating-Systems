@@ -36,4 +36,11 @@ Repository contendo exercícios e atividades práticas com microcontroladores ES
 - [Exercicio01](./AULA07/Exercicio01) – Comunicação entre tarefas com fila
 - [Exercicio02](./AULA07/Exercicio02) – Display de 7 segmentos com multiplexação e fila
 
+### AULA08 - Semáforos no FreeRTOS
+- [README](./AULA08/README.md) – Introdução aos semáforos, mutex e semáforo contador
+- [Exemplo1](./AULA08/Exemplo1) – Exemplo com mutex
+- [Exemplo2](./AULA08/Exemplo2) – Exemplo com semáforo binário
+- [Exemplo3](./AULA08/Exemplo3) – Exemplo com semáforo contador
+- [Exercício01](./AULA08/Exercício01) – Leitura do ultrassom acionada por botão com semáforo
+
 ---
