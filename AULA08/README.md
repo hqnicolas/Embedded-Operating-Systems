@@ -58,3 +58,5 @@ O Mutex é essencial para proteger recursos críticos:
 * **Acesso:** A Tarefa A solicita o Mutex e, como ele está disponível, torna-se a sua detentora e acessa o recurso.
 * **Bloqueio:** Se a Tarefa B tentar acessar o mesmo recurso enquanto a A ainda o possui, a tentativa de `xSemaphoreTake()` falhará e a Tarefa B será bloqueada.
 * **Liberação:** Assim que a Tarefa A devolve o Mutex, a Tarefa B é desbloqueada, obtém o semáforo e ganha permissão para acessar o recurso.
+
+---
