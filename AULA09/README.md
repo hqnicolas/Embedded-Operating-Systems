@@ -51,9 +51,16 @@
 ---
 
 ## Funcionamento e API
+
+<img width="951" height="531" alt="image" src="https://github.com/user-attachments/assets/5df17763-f527-4c39-af7a-dc9d0faa57dc" />
+
+
 * O código da aplicação escreve comandos na fila do timer (*Timer command queue*) através de chamadas de API, como a função `xTimerReset()`. 
 * A tarefa *Daemon* do FreeRTOS aguarda comandos e faz a leitura dessa fila usando funções como `xQueueReceive()`, processando-os em seguida. 
 * O padrão de execução e bloqueio das tarefas depende se a prioridade da tarefa que chama a API (ex: `xTimerStart()`) está acima ou abaixo da prioridade da *Daemon task*. 
+
+<img width="658" height="467" alt="image" src="https://github.com/user-attachments/assets/d11f267c-53ef-493f-bc76-ab606bc6fb77" />
+
 
 ---
 
