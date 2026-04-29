@@ -92,3 +92,19 @@ BaseType_t xTimerDelete( TimerHandle_t xTimer, TickType_t xBlockTime );
 // Exemplo de uso
 xTimerDelete( xTimer, 0 );
 ```
+
+---
+
+## Exemplo Prático da Aula
+* Ao pressionar `BOTAO1`, o `LED2` acende imediatamente e um timer **one-shot** de 3 segundos é reiniciado com `xTimerReset()`.
+* Quando esse tempo termina, a função de *call-back* desliga o `LED2`.
+* A mesma pressão no botão também alterna o estado de dois timers **auto reload**:
+* `LED3` pisca a cada 500ms.
+* `LED4` pisca a cada 1000ms.
+
+### Conceitos mostrados no código
+* Criação de timers com `xTimerCreate()`.
+* Inicialização com `xTimerStart()`.
+* Parada com `xTimerStop()`.
+* Reinício de contagem com `xTimerReset()`.
+* Uso de timers periódicos e de disparo único na mesma aplicação.
