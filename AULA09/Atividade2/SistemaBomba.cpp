@@ -7,6 +7,8 @@ static const uint16_t INTERVALO_RAPIDO_MS = 500;
 static const uint16_t TEMPO_STATUS_MS = 3000;
 static const uint16_t LIMIAR_OBSTRUCAO = 2200;
 static const uint8_t TAMANHO_FILA_EVENTOS = 10;
+static const uint8_t RGB_ATIVO = LOW;
+static const uint8_t RGB_DESLIGADO = HIGH;
 
 static const byte numeros[10][8] = {
   {1, 1, 1, 1, 1, 1, 0, 0},
@@ -127,8 +129,9 @@ static void configurarPinos() {
   pinMode(RGB_RED, OUTPUT);
   pinMode(RGB_BLUE, OUTPUT);
 
-  digitalWrite(RGB_RED, HIGH);
-  digitalWrite(RGB_BLUE, HIGH);
+  // LED RGB com anodo comum: acende em LOW e apaga em HIGH.
+  digitalWrite(RGB_RED, RGB_DESLIGADO);
+  digitalWrite(RGB_BLUE, RGB_DESLIGADO);
 
   for (uint8_t i = 0; i < SEGMENTOS_POR_DIGITO; i++) {
     pinMode(pinosSegmentos[i], OUTPUT);
@@ -333,18 +336,18 @@ static void setEstadoSeguro(EstadoSistema novoEstado) {
 }
 
 static void ligarLedExplosao() {
-  digitalWrite(RGB_BLUE, HIGH);
-  digitalWrite(RGB_RED, LOW);
+  digitalWrite(RGB_BLUE, RGB_DESLIGADO);
+  digitalWrite(RGB_RED, RGB_ATIVO);
 }
 
 static void ligarLedSalvo() {
-  digitalWrite(RGB_RED, HIGH);
-  digitalWrite(RGB_BLUE, LOW);
+  digitalWrite(RGB_RED, RGB_DESLIGADO);
+  digitalWrite(RGB_BLUE, RGB_ATIVO);
 }
 
 static void desligarStatus() {
-  digitalWrite(RGB_RED, HIGH);
-  digitalWrite(RGB_BLUE, HIGH);
+  digitalWrite(RGB_RED, RGB_DESLIGADO);
+  digitalWrite(RGB_BLUE, RGB_DESLIGADO);
 }
 
 static void iniciarContagem() {
