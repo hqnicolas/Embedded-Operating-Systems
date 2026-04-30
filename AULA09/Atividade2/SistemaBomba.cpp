@@ -1,4 +1,4 @@
-#include "SistemaFogos.h"
+#include "SistemaBomba.h"
 
 static const uint8_t SEGMENTOS_POR_DIGITO = 8;
 static const uint16_t CONTAGEM_INICIAL = 59;
@@ -63,10 +63,10 @@ static void ligarLedSalvo();
 static void desligarStatus();
 static void iniciarContagem();
 static void cancelarContagem();
-static void explodirFogos();
+static void explodirBomba();
 static void enviarEvento(EventoSistema evento);
 
-void inicializarSistemaFogos() {
+void inicializarSistemaBomba() {
   configurarPinos();
   analogReadResolution(12);
 
@@ -114,7 +114,7 @@ void inicializarSistemaFogos() {
   }
 }
 
-void loopSistemaFogos() {
+void loopSistemaBomba() {
   vTaskDelay(pdMS_TO_TICKS(1000));
 }
 
@@ -211,7 +211,7 @@ static void taskControle(void *pvParameters) {
 
         case EVENTO_BOTAO_EXPLODE:
           if (getEstadoSeguro() == ESTADO_CONTAGEM) {
-            explodirFogos();
+            explodirBomba();
           }
           break;
 
@@ -223,7 +223,7 @@ static void taskControle(void *pvParameters) {
             }
 
             if (segundosRestantes == 0) {
-              explodirFogos();
+              explodirBomba();
               segundosRestantes = CONTAGEM_INICIAL;
             }
           }
@@ -362,7 +362,7 @@ static void cancelarContagem() {
   xTimerReset(timerStatus, 0);
 }
 
-static void explodirFogos() {
+static void explodirBomba() {
   xTimerStop(timerContagem, 0);
   setEstadoSeguro(ESTADO_EXPLODIU);
   ligarLedExplosao();

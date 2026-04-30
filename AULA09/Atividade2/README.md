@@ -1,4 +1,4 @@
-# Atividade 2 - Sistema de Fogos com FreeRTOS
+# Atividade 2 - Sistema de Bomba com FreeRTOS
 
 ## Objetivo
 

@@ -1,9 +1,9 @@
-#include "SistemaFogos.h"
+#include "SistemaBomba.h"
 
 void setup() {
-  inicializarSistemaFogos();
+  inicializarSistemaBomba();
 }
 
 void loop() {
-  loopSistemaFogos();
+  loopSistemaBomba();
 }

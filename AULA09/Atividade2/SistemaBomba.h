@@ -1,5 +1,5 @@
-#ifndef SISTEMA_FOGOS_H
-#define SISTEMA_FOGOS_H
+#ifndef SISTEMA_BOMBA_H
+#define SISTEMA_BOMBA_H
 
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
@@ -42,7 +42,7 @@ enum EventoSistema {
   EVENTO_LIMPA_STATUS
 };
 
-void inicializarSistemaFogos();
-void loopSistemaFogos();
+void inicializarSistemaBomba();
+void loopSistemaBomba();
 
 #endif
