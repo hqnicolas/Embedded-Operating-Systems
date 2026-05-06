@@ -43,4 +43,16 @@ Repository contendo exercícios e atividades práticas com microcontroladores ES
 - [Exemplo3](./AULA08/Exemplo3) – Exemplo com semáforo contador
 - [Exercício01](./AULA08/Exercício01) – Leitura do ultrassom acionada por botão com semáforo
 
+### AULA09 - Software Timers no FreeRTOS
+- [README](./AULA09/README.md) – Introdução a software timers, daemon task e funções de controle
+- [Exemplo1](./AULA09/Exemplo1) – Timer one-shot e auto reload com LEDs e botão
+- [Exemplo2](./AULA09/Exemplo2) – Exemplo prático adicional com software timer
+- [Atividade1](./AULA09/Atividade1) – Sequência de LEDs usando timer
+- [Atividade2](./AULA09/Atividade2) – Sistema de bomba com temporização
+
+### AULA10 - Event Groups e Task Notifications
+- [README](./AULA10/README.md) – Conceitos de event groups, flags e task notifications
+- [Exemplo1](./AULA10/Exemplo1) – Exemplo com task notifications
+- [Exemplo2](./AULA10/Exemplo2) – Exemplo com event groups
+
 ---
