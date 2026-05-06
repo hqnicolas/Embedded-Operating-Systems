@@ -3,7 +3,7 @@
 #include "freertos/task.h"
 
 #define LED 2
-#define BT 12
+#define BT 0
 
 TaskHandle_t xTaskTrataBTHandle;
 
