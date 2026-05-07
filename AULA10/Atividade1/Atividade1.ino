@@ -1,4 +1,6 @@
-/* Inclusao das bibliotecas do FreeRTOS */
+/*=======================================
+ Inclusao das bibliotecas do FreeRTOS 
+========================================= */
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/event_groups.h"
@@ -8,7 +10,9 @@
 #define S2 2
 #define MOTOR 15
 
-/* Mapeamento dos bits do grupo de eventos */
+/*=======================================
+Mapeamento dos bits do grupo de eventos 
+========================================= */
 #define BIT_START (1 << 0)
 #define BIT_S1    (1 << 1)
 #define BIT_S2    (1 << 2)
