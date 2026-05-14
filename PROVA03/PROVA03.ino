@@ -14,8 +14,7 @@
 
 static const uint8_t led = 4;
 static const uint8_t valvula = 0;
-static const uint8_t valvulaAcionada = LOW;
-static const uint8_t valvulaDesligada = HIGH;
+
 static const uint8_t emergencia = 2;
 static const uint8_t ldr = 39;
 static const uint8_t pot = 34;
@@ -97,15 +96,11 @@ void setup() {
   pinMode(ldr, INPUT);
   pinMode(pot, INPUT);
   pinMode(led, OUTPUT);
-
-  pinMode(valvula, INPUT_PULLUP);
-  digitalWrite(valvula, valvulaDesligada);
   pinMode(valvula, OUTPUT);
-
   pinMode(emergencia, INPUT_PULLUP);
 
+  digitalWrite(valvula, LOW);
   digitalWrite(led, LOW);
-  aplicarValvula(false);
 
   for (uint8_t i = 0; i < 8; i++) {
     pinMode(pinosSegmentos[i], OUTPUT);
@@ -308,7 +303,7 @@ void aplicarSaidasDeAlarme(EventBits_t bits) {
 }
 
 void aplicarValvula(bool acionada) {
-  digitalWrite(valvula, acionada ? valvulaAcionada : valvulaDesligada);
+  digitalWrite(valvula, acionada ? LOW : HIGH);
 }
 
 void apagarDisplays() {
