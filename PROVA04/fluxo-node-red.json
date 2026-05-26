@@ -1,0 +1,575 @@
+[
+  {
+    "id": "p04_tab",
+    "type": "tab",
+    "label": "PROVA04 Smart Desk",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "p04_temp_in",
+    "type": "mqtt in",
+    "z": "p04_tab",
+    "name": "Temperatura",
+    "topic": "satc/g7/telemetry/temperature",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "p04_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 150,
+    "y": 80,
+    "wires": [
+      [
+        "p04_temp_gauge",
+        "p04_temp_debug"
+      ]
+    ]
+  },
+  {
+    "id": "p04_hum_in",
+    "type": "mqtt in",
+    "z": "p04_tab",
+    "name": "Umidade",
+    "topic": "satc/g7/telemetry/humidity",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "p04_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 130,
+    "y": 140,
+    "wires": [
+      [
+        "p04_hum_gauge"
+      ]
+    ]
+  },
+  {
+    "id": "p04_lux_in",
+    "type": "mqtt in",
+    "z": "p04_tab",
+    "name": "Luminosidade",
+    "topic": "satc/g7/telemetry/luminosity",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "p04_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 150,
+    "y": 220,
+    "wires": [
+      [
+        "p04_lux_chart",
+        "p04_store_lux",
+        "p04_lux_text"
+      ]
+    ]
+  },
+  {
+    "id": "p04_focus_in",
+    "type": "mqtt in",
+    "z": "p04_tab",
+    "name": "Modo de foco",
+    "topic": "satc/g7/status/focus",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "p04_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 150,
+    "y": 300,
+    "wires": [
+      [
+        "p04_focus_text",
+        "p04_store_focus"
+      ]
+    ]
+  },
+  {
+    "id": "p04_alert_in",
+    "type": "mqtt in",
+    "z": "p04_tab",
+    "name": "Alerta",
+    "topic": "satc/g7/status/alert",
+    "qos": "0",
+    "datatype": "auto-detect",
+    "broker": "p04_broker",
+    "nl": false,
+    "rap": true,
+    "rh": 0,
+    "inputs": 0,
+    "x": 110,
+    "y": 360,
+    "wires": [
+      [
+        "p04_alert_text"
+      ]
+    ]
+  },
+  {
+    "id": "p04_temp_gauge",
+    "type": "ui-gauge",
+    "z": "p04_tab",
+    "name": "Gauge Temperatura",
+    "group": "p04_ui_group_sensores",
+    "order": 1,
+    "width": "4",
+    "height": "4",
+    "gtype": "gauge-half",
+    "gstyle": "needle",
+    "title": "Temperatura",
+    "units": "C",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "0",
+        "color": "#00b500"
+      },
+      {
+        "from": "20",
+        "color": "#e6e600"
+      },
+      {
+        "from": "30",
+        "color": "#ca3838"
+      }
+    ],
+    "min": 0,
+    "max": 50,
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "x": 430,
+    "y": 80,
+    "wires": []
+  },
+  {
+    "id": "p04_hum_gauge",
+    "type": "ui-gauge",
+    "z": "p04_tab",
+    "name": "Gauge Umidade",
+    "group": "p04_ui_group_sensores",
+    "order": 2,
+    "width": "4",
+    "height": "4",
+    "gtype": "gauge-half",
+    "gstyle": "needle",
+    "title": "Umidade",
+    "units": "%",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "0",
+        "color": "#ca3838"
+      },
+      {
+        "from": "30",
+        "color": "#e6e600"
+      },
+      {
+        "from": "60",
+        "color": "#00b500"
+      }
+    ],
+    "min": 0,
+    "max": 100,
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "x": 420,
+    "y": 140,
+    "wires": []
+  },
+  {
+    "id": "p04_lux_chart",
+    "type": "ui-chart",
+    "z": "p04_tab",
+    "name": "Grafico Luminosidade",
+    "group": "p04_ui_group_sensores",
+    "label": "Luminosidade",
+    "order": 3,
+    "chartType": "line",
+    "category": "topic",
+    "categoryType": "msg",
+    "xAxisLabel": "",
+    "xAxisProperty": "",
+    "xAxisPropertyType": "msg",
+    "xAxisType": "time",
+    "xAxisFormat": "",
+    "xAxisFormatType": "auto",
+    "yAxisLabel": "",
+    "yAxisProperty": "",
+    "ymin": "0",
+    "ymax": "100",
+    "action": "append",
+    "stackSeries": false,
+    "pointShape": "line",
+    "pointRadius": "2",
+    "showLegend": false,
+    "removeOlder": "1",
+    "removeOlderUnit": "3600",
+    "removeOlderPoints": "",
+    "colors": [
+      "#1f77b4",
+      "#aec7e8",
+      "#ff7f0e",
+      "#2ca02c",
+      "#98df8a",
+      "#d62728",
+      "#ff9896",
+      "#9467bd",
+      "#c5b0d5"
+    ],
+    "width": "8",
+    "height": "4",
+    "className": "",
+    "x": 440,
+    "y": 220,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "p04_lux_text",
+    "type": "ui-text",
+    "z": "p04_tab",
+    "group": "p04_ui_group_status",
+    "order": 1,
+    "width": "4",
+    "height": "1",
+    "name": "Texto Luminosidade",
+    "label": "Luminosidade",
+    "format": "{{msg.payload}} %",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "className": "",
+    "x": 430,
+    "y": 260,
+    "wires": []
+  },
+  {
+    "id": "p04_focus_text",
+    "type": "ui-text",
+    "z": "p04_tab",
+    "group": "p04_ui_group_status",
+    "order": 2,
+    "width": "4",
+    "height": "1",
+    "name": "Texto Modo",
+    "label": "Modo",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "className": "",
+    "x": 420,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "p04_alert_text",
+    "type": "ui-text",
+    "z": "p04_tab",
+    "group": "p04_ui_group_status",
+    "order": 3,
+    "width": "4",
+    "height": "1",
+    "name": "Texto Alerta",
+    "label": "Alerta",
+    "format": "{{msg.payload}}",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "className": "",
+    "x": 410,
+    "y": 360,
+    "wires": []
+  },
+  {
+    "id": "p04_light_switch",
+    "type": "ui-switch",
+    "z": "p04_tab",
+    "name": "Comando Luz",
+    "label": "Luminaria",
+    "group": "p04_ui_group_controle",
+    "order": 1,
+    "width": "4",
+    "height": "1",
+    "layout": "row-spread",
+    "clickableArea": "switch",
+    "passthru": true,
+    "decouple": false,
+    "topic": "satc/g7/cmd/light",
+    "topicType": "msg",
+    "style": "",
+    "onvalue": "ON",
+    "onvalueType": "str",
+    "onicon": "",
+    "oncolor": "",
+    "offvalue": "OFF",
+    "offvalueType": "str",
+    "officon": "",
+    "offcolor": "",
+    "className": "",
+    "x": 150,
+    "y": 440,
+    "wires": [
+      [
+        "p04_light_out"
+      ]
+    ]
+  },
+  {
+    "id": "p04_light_out",
+    "type": "mqtt out",
+    "z": "p04_tab",
+    "name": "Publica comando de luz",
+    "topic": "satc/g7/cmd/light",
+    "qos": "",
+    "retain": "",
+    "respTopic": "",
+    "contentType": "",
+    "userProps": "",
+    "correl": "",
+    "expiry": "",
+    "broker": "p04_broker",
+    "x": 450,
+    "y": 440,
+    "wires": []
+  },
+  {
+    "id": "p04_store_focus",
+    "type": "function",
+    "z": "p04_tab",
+    "name": "Guarda foco e automatiza",
+    "func": "flow.set('focusState', msg.payload);\nconst lux = Number(flow.get('lastLux'));\nif (msg.payload !== 'FOCUS') {\n    msg.payload = 'OFF';\n    return [null, msg];\n}\nif (!Number.isNaN(lux) && lux < 40) {\n    msg.payload = 'ON';\n    return [null, msg];\n}\nmsg.payload = 'OFF';\nreturn [null, msg];",
+    "outputs": 2,
+    "timeout": "",
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 320,
+    "wires": [
+      [],
+      [
+        "p04_light_out"
+      ]
+    ]
+  },
+  {
+    "id": "p04_store_lux",
+    "type": "function",
+    "z": "p04_tab",
+    "name": "Guarda lux e automatiza",
+    "func": "const lux = Number(msg.payload);\nflow.set('lastLux', lux);\nconst focus = flow.get('focusState') || 'IDLE';\nif (focus !== 'FOCUS') {\n    return [msg, null];\n}\nif (lux < 40) {\n    msg.payload = 'ON';\n} else {\n    msg.payload = 'OFF';\n}\nreturn [null, msg];",
+    "outputs": 2,
+    "timeout": "",
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 460,
+    "y": 200,
+    "wires": [
+      [
+        "p04_lux_debug"
+      ],
+      [
+        "p04_light_out"
+      ]
+    ]
+  },
+  {
+    "id": "p04_temp_debug",
+    "type": "debug",
+    "z": "p04_tab",
+    "name": "Debug Temperatura",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 450,
+    "y": 40,
+    "wires": []
+  },
+  {
+    "id": "p04_lux_debug",
+    "type": "debug",
+    "z": "p04_tab",
+    "name": "Debug Lux",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 740,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "p04_tls",
+    "type": "tls-config",
+    "name": "HiveMQ TLS",
+    "cert": "",
+    "key": "",
+    "ca": "",
+    "certname": "",
+    "keyname": "",
+    "caname": "",
+    "servername": "",
+    "verifyservercert": false
+  },
+  {
+    "id": "p04_broker",
+    "type": "mqtt-broker",
+    "name": "HiveMQ 8883",
+    "broker": "broker.hivemq.com",
+    "port": "8883",
+    "clientid": "",
+    "autoConnect": true,
+    "usetls": true,
+    "protocolVersion": "4",
+    "keepalive": "60",
+    "cleansession": true,
+    "autoUnsubscribe": true,
+    "birthTopic": "",
+    "birthQos": "0",
+    "birthRetain": "false",
+    "birthPayload": "",
+    "birthMsg": {},
+    "closeTopic": "",
+    "closeQos": "0",
+    "closeRetain": "false",
+    "closePayload": "",
+    "closeMsg": {},
+    "willTopic": "",
+    "willQos": "0",
+    "willRetain": "false",
+    "willPayload": "",
+    "willMsg": {},
+    "userProps": "",
+    "sessionExpiry": "",
+    "tls": "p04_tls"
+  },
+  {
+    "id": "p04_ui_group_sensores",
+    "type": "ui-group",
+    "name": "Sensores",
+    "page": "p04_ui_page",
+    "width": "12",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "p04_ui_group_controle",
+    "type": "ui-group",
+    "name": "Controle",
+    "page": "p04_ui_page",
+    "width": "12",
+    "height": "1",
+    "order": 2,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "p04_ui_group_status",
+    "type": "ui-group",
+    "name": "Status",
+    "page": "p04_ui_page",
+    "width": "12",
+    "height": "1",
+    "order": 3,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "p04_ui_page",
+    "type": "ui-page",
+    "name": "PROVA04 Smart Desk",
+    "ui": "p04_ui_base",
+    "path": "/prova04-smart-desk",
+    "icon": "monitor-dashboard",
+    "layout": "grid",
+    "theme": "p04_ui_theme",
+    "order": 1,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "p04_ui_base",
+    "type": "ui-base",
+    "name": "PROVA04 Dashboard",
+    "path": "/dashboard",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "navigationStyle": "default",
+    "titleBarStyle": "default"
+  },
+  {
+    "id": "p04_ui_theme",
+    "type": "ui-theme",
+    "name": "PROVA04 Theme",
+    "colors": {
+      "surface": "#ffffff",
+      "primary": "#1f77b4",
+      "bgPage": "#f4f7fb",
+      "groupBg": "#ffffff",
+      "groupOutline": "#d8e1ec"
+    },
+    "sizes": {
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "4px",
+      "widgetGap": "12px",
+      "density": "comfortable"
+    }
+  }
+]
