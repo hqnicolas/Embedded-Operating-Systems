@@ -177,8 +177,8 @@ O fluxo inclui:
 - grafico e texto de `luminosidade`
 - texto de `modo`
 - texto de `alerta`
-- switch para comando `ON/OFF` da luminaria
-- automacao simples: se `FOCUS` estiver ativo e `luminosidade < 40`, o dashboard tambem publica `ON`
+- switch manual para comando `ON/OFF` da luminaria
+- a automacao da luminaria fica concentrada no `ESP32`, evitando republicar `cmd/light` a cada atualizacao de sensor ou status
 
 ## Como Executar
 

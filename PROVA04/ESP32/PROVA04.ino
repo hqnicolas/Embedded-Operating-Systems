@@ -1085,9 +1085,12 @@ void handleControlCommand(const ControlCommand &command) {
 
   switch (command.action) {
     case ACTION_SET_LIGHT:
-      gSystemState.manualOverrideEnabled = true;
-      gSystemState.manualOverrideState = command.boolValue;
-      stateChanged = true;
+      if (!gSystemState.manualOverrideEnabled ||
+          gSystemState.manualOverrideState != command.boolValue) {
+        gSystemState.manualOverrideEnabled = true;
+        gSystemState.manualOverrideState = command.boolValue;
+        stateChanged = true;
+      }
       break;
 
     case ACTION_SET_LUX_THRESHOLD:
@@ -1310,7 +1313,7 @@ void taskIoT(void *pvParameters) {
     }
 
     if (notificationValue & NOTIFY_IOT_STATE_CHANGED) {
-      publishStateToMqtt(false, true);
+      publishStateToMqtt(false, false);
     }
   }
 }

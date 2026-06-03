@@ -367,9 +367,9 @@
     "id": "p04_store_focus",
     "type": "function",
     "z": "p04_tab",
-    "name": "Guarda foco e automatiza",
-    "func": "flow.set('focusState', msg.payload);\nconst lux = Number(flow.get('lastLux'));\nif (msg.payload !== 'FOCUS') {\n    msg.payload = 'OFF';\n    return [null, msg];\n}\nif (!Number.isNaN(lux) && lux < 40) {\n    msg.payload = 'ON';\n    return [null, msg];\n}\nmsg.payload = 'OFF';\nreturn [null, msg];",
-    "outputs": 2,
+    "name": "Guarda foco",
+    "func": "flow.set('focusState', msg.payload);\nreturn null;",
+    "outputs": 1,
     "timeout": "",
     "noerr": 0,
     "initialize": "",
@@ -378,19 +378,16 @@
     "x": 470,
     "y": 320,
     "wires": [
-      [],
-      [
-        "p04_light_out"
-      ]
+      []
     ]
   },
   {
     "id": "p04_store_lux",
     "type": "function",
     "z": "p04_tab",
-    "name": "Guarda lux e automatiza",
-    "func": "const lux = Number(msg.payload);\nflow.set('lastLux', lux);\nconst focus = flow.get('focusState') || 'IDLE';\nif (focus !== 'FOCUS') {\n    return [msg, null];\n}\nif (lux < 40) {\n    msg.payload = 'ON';\n} else {\n    msg.payload = 'OFF';\n}\nreturn [null, msg];",
-    "outputs": 2,
+    "name": "Guarda lux",
+    "func": "const lux = Number(msg.payload);\nflow.set('lastLux', lux);\nreturn msg;",
+    "outputs": 1,
     "timeout": "",
     "noerr": 0,
     "initialize": "",
@@ -401,9 +398,6 @@
     "wires": [
       [
         "p04_lux_debug"
-      ],
-      [
-        "p04_light_out"
       ]
     ]
   },
