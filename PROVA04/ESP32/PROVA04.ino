@@ -35,8 +35,8 @@ constexpr int GROUP_ID = 7;
 #define SEG_F 23
 #define SEG_G 22
 #define SEG_DP 19
-#define DISPLAY_1 16
-#define DISPLAY_2 17
+#define DISPLAY_1 17
+#define DISPLAY_2 16
 #define DHT11_PIN 33
 #define LDR_PIN 39
 
