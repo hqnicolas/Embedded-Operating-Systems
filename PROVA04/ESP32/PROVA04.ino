@@ -12,19 +12,21 @@
 #include "freertos/timers.h"
 #include "freertos/event_groups.h"
 
-const char *WIFI_SSID = "SATC 2.4";
-const char *EAP_IDENTITY = "aluno.123456@alunosatc.edu.br";
-const char *EAP_USERNAME = "aluno.123456@alunosatc.edu.br";
-const char *EAP_PASSWORD = "123456";
+const char *SSID_WIFI_PRIMARIO = "Nicolas";
+const char *SENHA_WIFI_PRIMARIO = "0x123456";
+const char *SSID_WIFI_BACKUP = "SATC 2.4";
+const char *IDENTIDADE_EAP = "aluno.123456@alunosatc.edu.br";
+const char *USUARIO_EAP = "aluno.123456@alunosatc.edu.br";
+const char *SENHA_EAP = "123456";
 
-const char *MQTT_HOST = "broker.hivemq.com";
-constexpr int MQTT_PORT = 8883;
-const char *MQTT_USERNAME = "";
-const char *MQTT_PASSWORD = "";
-constexpr uint16_t MQTT_KEEP_ALIVE_SECONDS = 60;
-constexpr uint16_t MQTT_SOCKET_TIMEOUT_SECONDS = 20;
+const char *HOST_MQTT = "broker.hivemq.com";
+constexpr int PORTA_MQTT = 8883;
+const char *USUARIO_MQTT = "";
+const char *SENHA_MQTT = "";
+constexpr uint16_t SEGUNDOS_KEEP_ALIVE_MQTT = 60;
+constexpr uint16_t SEGUNDOS_TIMEOUT_SOCKET_MQTT = 20;
 
-constexpr int GROUP_ID = 7;
+constexpr int ID_GRUPO = 7;
 
 #define RELE 13
 #define SEG_A 18
@@ -35,10 +37,10 @@ constexpr int GROUP_ID = 7;
 #define SEG_F 23
 #define SEG_G 22
 #define SEG_DP 19
-#define DISPLAY_1 17
-#define DISPLAY_2 16
-#define DHT11_PIN 33
-#define LDR_PIN 39
+#define DIGITO_1 17
+#define DIGITO_2 16
+#define PINO_DHT11 33
+#define PINO_LDR 39
 
 #define LED1 4
 #define LED2 0
@@ -49,144 +51,150 @@ constexpr int GROUP_ID = 7;
 #define BOTAO3 2
 #define BOTAO4 15
 
-constexpr bool SHARE_LED_PINS_AS_BUTTONS = true;
-constexpr bool DISPLAY_SEGMENT_ACTIVE_HIGH = true;
-constexpr bool DISPLAY_DIGIT_ACTIVE_LOW = true;
+constexpr bool COMPARTILHAR_PINOS_LEDS_COM_BOTOES = true;
+constexpr bool DISPLAY_SEGMENTO_ATIVO_ALTO = true;
+constexpr bool DISPLAY_DIGITO_ATIVO_BAIXO = true;
 
-constexpr unsigned long WIFI_CONNECT_TIMEOUT_MS = 20000;
-constexpr unsigned long WIFI_RETRY_INTERVAL_MS = 5000;
-constexpr unsigned long MQTT_RETRY_INTERVAL_MS = 5000;
-constexpr unsigned long BUTTON_DEBOUNCE_MS = 60;
-constexpr unsigned long SHARED_PIN_OUTPUT_TIME_US = 1500;
+constexpr unsigned long WIFI_TIMEOUT_CONEXAO_MS = 20000;
+constexpr unsigned long WIFI_INTERVALO_RECONEXAO_MS = 5000;
+constexpr unsigned long MQTT_INTERVALO_RECONEXAO_MS = 5000;
+constexpr unsigned long BOTAO_DEBOUNCE_MS = 60;
+constexpr unsigned long TEMPO_SAIDA_PINO_COMPARTILHADO_US = 1500;
 
-constexpr uint32_t SENSOR_SAMPLE_INTERVAL_MS = 1500;
-constexpr uint32_t TELEMETRY_PUBLISH_INTERVAL_MS = 4000;
-constexpr uint32_t CONTROL_LOOP_WAIT_MS = 5;
-constexpr uint32_t DISPLAY_DIGIT_HOLD_MS = 2;
-constexpr uint32_t IOT_LOOP_WAIT_MS = 20;
+constexpr uint32_t INTERVALO_AMOSTRAGEM_SENSORES_MS = 1500;
+constexpr uint32_t INTERVALO_PUBLICACAO_TELEMETRIA_MS = 4000;
+constexpr uint32_t INTERVALO_LOOP_CONTROLE_MS = 5;
+constexpr uint32_t INTERVALO_RETENCAO_DIGITO_MS = 2;
+constexpr uint32_t INTERVALO_LOOP_IOT_MS = 20;
 
-constexpr int DEFAULT_LUMINOSITY_THRESHOLD = 40;
-constexpr int DEFAULT_HUMIDITY_ALERT_THRESHOLD = 30;
-constexpr int DEFAULT_TEMPERATURE_ALERT_C = 30;
-constexpr uint32_t DEFAULT_FOCUS_DURATION_SECONDS = 25;
-constexpr uint32_t DEFAULT_PAUSE_DURATION_SECONDS = 5;
+constexpr int LIMIAR_PADRAO_LUMINOSIDADE = 40;
+constexpr int LIMIAR_PADRAO_ALERTA_UMIDADE = 30;
+constexpr int TEMPERATURA_PADRAO_ALERTA_C = 30;
+constexpr uint32_t DURACAO_PADRAO_FOCO_SEGUNDOS = 25;
+constexpr uint32_t DURACAO_PADRAO_PAUSA_SEGUNDOS = 5;
 
-constexpr size_t SENSOR_QUEUE_LENGTH = 1;
-constexpr size_t CONTROL_QUEUE_LENGTH = 10;
+constexpr size_t TAMANHO_FILA_SENSORES = 1;
+constexpr size_t TAMANHO_FILA_CONTROLE = 10;
 
-constexpr uint32_t NOTIFY_SENSOR_SAMPLE = 1UL << 0;
-constexpr uint32_t NOTIFY_CONTROL_CYCLE_TICK = 1UL << 0;
-constexpr uint32_t NOTIFY_CONTROL_SENSOR_DATA = 1UL << 1;
-constexpr uint32_t NOTIFY_CONTROL_REMOTE_CMD = 1UL << 2;
-constexpr uint32_t NOTIFY_CONTROL_CONNECTIVITY = 1UL << 3;
-constexpr uint32_t NOTIFY_DISPLAY_REFRESH = 1UL << 0;
-constexpr uint32_t NOTIFY_IOT_PUBLISH = 1UL << 0;
-constexpr uint32_t NOTIFY_IOT_STATE_CHANGED = 1UL << 1;
+constexpr uint32_t NOTIFICACAO_AMOSTRAGEM_SENSORES = 1UL << 0;
+constexpr uint32_t NOTIFICACAO_TICK_CICLO_CONTROLE = 1UL << 0;
+constexpr uint32_t NOTIFICACAO_DADOS_SENSORES_CONTROLE = 1UL << 1;
+constexpr uint32_t NOTIFICACAO_COMANDO_REMOTO_CONTROLE = 1UL << 2;
+constexpr uint32_t NOTIFICACAO_CONECTIVIDADE_CONTROLE = 1UL << 3;
+constexpr uint32_t NOTIFICACAO_ATUALIZAR_DISPLAY = 1UL << 0;
+constexpr uint32_t NOTIFICACAO_PUBLICAR_IOT = 1UL << 0;
+constexpr uint32_t NOTIFICACAO_ESTADO_ALTERADO_IOT = 1UL << 1;
 
 constexpr EventBits_t BIT_WIFI_OK = 1UL << 0;
 constexpr EventBits_t BIT_MQTT_OK = 1UL << 1;
-constexpr EventBits_t BIT_FOCUS_ACTIVE = 1UL << 2;
-constexpr EventBits_t BIT_ALERT_ACTIVE = 1UL << 3;
+constexpr EventBits_t BIT_FOCO_ATIVO = 1UL << 2;
+constexpr EventBits_t BIT_ALERTA_ATIVO = 1UL << 3;
 
-enum FocusMode : uint8_t {
-  MODE_IDLE = 0,
-  MODE_FOCUS,
-  MODE_PAUSE
+enum ModoFoco : uint8_t {
+  MODO_OCIOSO = 0,
+  MODO_FOCO,
+  MODO_PAUSA
 };
 
-enum DisplayMode : uint8_t {
-  DISPLAY_TEMPERATURE = 0,
-  DISPLAY_HUMIDITY,
-  DISPLAY_LUMINOSITY
+enum ModoExibicao : uint8_t {
+  EXIBICAO_TEMPERATURA = 0,
+  EXIBICAO_UMIDADE,
+  EXIBICAO_LUMINOSIDADE
 };
 
-enum AlertState : uint8_t {
-  ALERT_OK = 0,
-  ALERT_WARN,
-  ALERT_ACTIVE
+enum EstadoAlerta : uint8_t {
+  ALERTA_OK = 0,
+  ALERTA_AVISO,
+  ALERTA_ATIVO
 };
 
-enum ControlSource : uint8_t {
-  SOURCE_MQTT = 0,
-  SOURCE_HTTP,
-  SOURCE_LOCAL
+enum PerfilWifi : uint8_t {
+  PERFIL_WIFI_NENHUM = 0,
+  PERFIL_WIFI_PRIMARIO,
+  PERFIL_WIFI_BACKUP
 };
 
-enum ControlAction : uint8_t {
-  ACTION_SET_LIGHT = 0,
-  ACTION_SET_LUX_THRESHOLD,
-  ACTION_SET_HUMIDITY_THRESHOLD,
-  ACTION_SET_FOCUS_SECONDS,
-  ACTION_SET_PAUSE_SECONDS
+enum OrigemControle : uint8_t {
+  ORIGEM_MQTT = 0,
+  ORIGEM_HTTP,
+  ORIGEM_LOCAL
 };
 
-struct SensorSnapshot {
-  float temperatureC;
-  float humidityPercent;
-  int ldrRaw;
-  int ldrPercent;
-  bool dhtOk;
-  unsigned long timestampMs;
+enum AcaoControle : uint8_t {
+  ACAO_DEFINIR_LUZ = 0,
+  ACAO_DEFINIR_LIMIAR_LUMINOSIDADE,
+  ACAO_DEFINIR_LIMIAR_UMIDADE,
+  ACAO_DEFINIR_SEGUNDOS_FOCO,
+  ACAO_DEFINIR_SEGUNDOS_PAUSA
 };
 
-struct Thresholds {
-  int luminosityPercent;
-  int humidityPercent;
+struct LeituraSensores {
+  float temperaturaC;
+  float umidadePercentual;
+  int ldrBruto;
+  int ldrPercentual;
+  bool dhtValido;
+  unsigned long instanteMs;
 };
 
-struct ConnectivityState {
-  bool wifiConnected;
-  bool mqttConnected;
+struct Limiares {
+  int luminosidadePercentual;
+  int umidadePercentual;
 };
 
-struct SystemState {
-  FocusMode mode;
-  DisplayMode displayMode;
-  bool relayOn;
-  bool manualOverrideEnabled;
-  bool manualOverrideState;
-  Thresholds thresholds;
-  uint32_t focusDurationSeconds;
-  uint32_t pauseDurationSeconds;
-  uint32_t countdownSeconds;
-  ConnectivityState connectivity;
-  SensorSnapshot lastSensors;
+struct EstadoConectividade {
+  bool wifiConectado;
+  bool mqttConectado;
 };
 
-struct ControlCommand {
-  ControlSource source;
-  ControlAction action;
-  int value;
-  bool boolValue;
+struct EstadoSistema {
+  ModoFoco modo;
+  ModoExibicao modoExibicao;
+  bool releLigado;
+  bool controleManualAtivo;
+  bool estadoControleManual;
+  Limiares limiares;
+  uint32_t duracaoFocoSegundos;
+  uint32_t duracaoPausaSegundos;
+  uint32_t contagemRegressivaSegundos;
+  EstadoConectividade conectividade;
+  LeituraSensores ultimaLeituraSensores;
 };
 
-DFRobot_DHT11 dht;
-WiFiClientSecure espClient;
-PubSubClient mqttClient(espClient);
-WebServer server(80);
+struct ComandoControle {
+  OrigemControle origem;
+  AcaoControle acao;
+  int valor;
+  bool valorBooleano;
+};
 
-QueueHandle_t qSensorSnapshots = NULL;
-QueueHandle_t qControlCommands = NULL;
+DFRobot_DHT11 sensorDht;
+WiFiClientSecure clienteEsp;
+PubSubClient clienteMqtt(clienteEsp);
+WebServer servidor(80);
+
+QueueHandle_t qLeiturasSensores = NULL;
+QueueHandle_t qComandosControle = NULL;
 SemaphoreHandle_t mutexEstado = NULL;
 EventGroupHandle_t gEventos = NULL;
 
-TimerHandle_t tmrSample = NULL;
-TimerHandle_t tmrCycleTick = NULL;
-TimerHandle_t tmrPublish = NULL;
+TimerHandle_t tmrAmostragem = NULL;
+TimerHandle_t tmrTickCiclo = NULL;
+TimerHandle_t tmrPublicacao = NULL;
 
-TaskHandle_t taskSensoresHandle = NULL;
-TaskHandle_t taskControleHandle = NULL;
-TaskHandle_t taskDisplayHandle = NULL;
-TaskHandle_t taskIoTHandle = NULL;
+TaskHandle_t handleTarefaSensores = NULL;
+TaskHandle_t handleTarefaControle = NULL;
+TaskHandle_t handleTarefaDisplay = NULL;
+TaskHandle_t handleTarefaIoT = NULL;
 
-SystemState gSystemState;
+EstadoSistema gEstadoSistema;
 
-const int LED_PINS[4] = {LED1, LED2, LED3, LED4};
-const int BUTTON_PINS[4] = {BOTAO1, BOTAO2, BOTAO3, BOTAO4};
-const int SEGMENT_PINS[8] = {SEG_A, SEG_B, SEG_C, SEG_D, SEG_E, SEG_F, SEG_G, SEG_DP};
-const int DISPLAY_PINS[2] = {DISPLAY_1, DISPLAY_2};
+const int PINOS_LEDS[4] = {LED1, LED2, LED3, LED4};
+const int PINOS_BOTOES[4] = {BOTAO1, BOTAO2, BOTAO3, BOTAO4};
+const int PINOS_SEGMENTOS[8] = {SEG_A, SEG_B, SEG_C, SEG_D, SEG_E, SEG_F, SEG_G, SEG_DP};
+const int PINOS_DIGITOS[2] = {DIGITO_1, DIGITO_2};
 
-const byte DIGIT_PATTERNS[10][8] = {
+const byte PADROES_DIGITOS[10][8] = {
   {1, 1, 1, 1, 1, 1, 0, 0},
   {0, 1, 1, 0, 0, 0, 0, 0},
   {1, 1, 0, 1, 1, 0, 1, 0},
@@ -199,497 +207,502 @@ const byte DIGIT_PATTERNS[10][8] = {
   {1, 1, 1, 1, 0, 1, 1, 0}
 };
 
-bool ledStates[4] = {false, false, false, false};
-bool buttonStableStates[4] = {HIGH, HIGH, HIGH, HIGH};
-bool buttonLastReadings[4] = {HIGH, HIGH, HIGH, HIGH};
-unsigned long buttonLastDebounceMs[4] = {0, 0, 0, 0};
+bool estadosLeds[4] = {false, false, false, false};
+bool estadosEstaveisBotoes[4] = {HIGH, HIGH, HIGH, HIGH};
+bool ultimasLeiturasBotoes[4] = {HIGH, HIGH, HIGH, HIGH};
+unsigned long ultimosDebouncesBotoesMs[4] = {0, 0, 0, 0};
 
-bool httpRoutesConfigured = false;
-bool httpServerStarted = false;
-unsigned long lastWiFiReconnectAttemptMs = 0;
-unsigned long lastMqttReconnectAttemptMs = 0;
+bool rotasHttpConfiguradas = false;
+bool servidorHttpIniciado = false;
+PerfilWifi perfilWifiAtivo = PERFIL_WIFI_NENHUM;
+unsigned long tentativaWifiIniciadaMs = 0;
+unsigned long ultimoCicloReconexaoWifiMs = 0;
+unsigned long ultimaTentativaReconexaoMqttMs = 0;
 
-char topicTemperature[48];
-char topicHumidity[48];
-char topicLuminosity[48];
-char topicLightCommand[48];
-char topicFocusStatus[48];
-char topicAlertStatus[48];
+char topicoTemperatura[48];
+char topicoUmidade[48];
+char topicoLuminosidade[48];
+char topicoComandoLuz[48];
+char topicoEstadoFoco[48];
+char topicoEstadoAlerta[48];
 
-String lastPublishedFocus = "";
-String lastPublishedAlert = "";
+String ultimoFocoPublicado = "";
+String ultimoAlertaPublicado = "";
 
-void failSafe(const char *message);
-void buildTopics();
-void initializeSystemState();
-void initializeDisplayHardware();
-void initializeButtonsAndLeds();
-void configureSharedPinsAsInput();
-void refreshSharedLedOutputs();
-void updateOutputCacheFromState(const SystemState &state);
-void applySegmentLevel(int pin, bool active);
-void applyDigitLevel(int pin, bool active);
-void disableDisplays();
-void writeDigitPattern(int value, bool decimalPoint);
-int computeDisplayValue(const SystemState &state);
-void multiplexDisplay(const SystemState &state);
-void copySystemState(SystemState &destination);
-const char *focusModeToText(FocusMode mode);
-const char *displayModeToText(DisplayMode mode);
-AlertState computeAlertState(const SystemState &state);
-const char *alertStateToText(AlertState alertState);
-bool payloadMeansOn(const String &payload);
-bool payloadMeansOff(const String &payload);
-void syncConnectivityState();
-void syncStateEventBits(const SystemState &state);
-void notifyStateConsumers();
-void updateActuatorsFromState();
-void applyLightingDecisionLocked();
-void setModeLocked(FocusMode nextMode);
-bool enqueueControlCommand(const ControlCommand &command, TickType_t ticksToWait);
-String buildStatusJson();
-String buildHtmlPage();
-void configureHttpRoutes();
-void startHttpServer();
-void handleRoot();
-void handleStatus();
-void handleConfig();
-void handleNotFound();
-void startWiFiConnection();
-bool waitForWiFi(unsigned long timeoutMs);
-void maintainWiFiConnection();
-bool connectToMqttBroker();
-void maintainMqttConnection();
-void subscribeTopics();
-void mqttCallback(char *topic, byte *payload, unsigned int length);
-void publishTelemetrySnapshot(const SystemState &state);
-void publishStatusSnapshot(const SystemState &state, bool force);
-void publishStateToMqtt(bool publishTelemetryNow, bool forceStatus);
-void processButtonPress(int buttonIndex);
-void processButtons();
-void handleSensorSnapshot(const SensorSnapshot &snapshot);
-void handleControlCommand(const ControlCommand &command);
-void handleCycleTick();
-void refreshControlOutputs(bool notifyConsumersNow);
-void callbackSampleTimer(TimerHandle_t xTimer);
-void callbackCycleTimer(TimerHandle_t xTimer);
-void callbackPublishTimer(TimerHandle_t xTimer);
-void taskSensores(void *pvParameters);
-void taskControle(void *pvParameters);
-void taskDisplay(void *pvParameters);
-void taskIoT(void *pvParameters);
+void falhaSegura(const char *mensagem);
+void montarTopicos();
+void inicializarEstadoSistema();
+void inicializarHardwareDisplay();
+void inicializarBotoesELeds();
+void configurarPinosCompartilhadosComoEntrada();
+void atualizarSaidasCompartilhadasLeds();
+void atualizarCacheSaidasComEstado(const EstadoSistema &estado);
+void aplicarNivelSegmento(int pino, bool ativo);
+void aplicarNivelDigito(int pino, bool ativo);
+void desabilitarDisplays();
+void escreverPadraoDigito(int valor, bool pontoDecimal);
+int calcularValorExibicao(const EstadoSistema &estado);
+void multiplexarDisplay(const EstadoSistema &estado);
+void copiarEstadoSistema(EstadoSistema &destino);
+const char *modoFocoParaTexto(ModoFoco modo);
+const char *modoExibicaoParaTexto(ModoExibicao modo);
+EstadoAlerta calcularEstadoAlerta(const EstadoSistema &estado);
+const char *estadoAlertaParaTexto(EstadoAlerta estadoAlerta);
+bool payloadSignificaLigar(const String &payload);
+bool payloadSignificaDesligar(const String &payload);
+void sincronizarEstadoConectividade();
+void sincronizarBitsEventosEstado(const EstadoSistema &estado);
+void notificarConsumidoresEstado();
+void atualizarAtuadoresComEstado();
+void aplicarDecisaoIluminacaoTravado();
+void definirModoTravado(ModoFoco proximoModo);
+bool enfileirarComandoControle(const ComandoControle &comando, TickType_t ticksDeEspera);
+String montarJsonEstado();
+String montarPaginaHtml();
+void configurarRotasHttp();
+void iniciarServidorHttp();
+void tratarRaiz();
+void tratarEstado();
+void tratarConfiguracao();
+void tratarNaoEncontrado();
+void limparTentativaConexaoWifi();
+void iniciarConexaoWifi(PerfilWifi perfil);
+bool aguardarWifi(unsigned long timeoutMs);
+void manterConexaoWifi();
+bool conectarBrokerMqtt();
+void manterConexaoMqtt();
+void inscreverTopicos();
+void callbackMqtt(char *topico, byte *payload, unsigned int comprimento);
+void publicarLeituraTelemetria(const EstadoSistema &estado);
+void publicarResumoStatus(const EstadoSistema &estado, bool forcar);
+void publicarEstadoNoMqtt(bool publicarTelemetriaAgora, bool forcarStatus);
+void processarPressionamentoBotao(int indiceBotao);
+void processarBotoes();
+void tratarLeituraSensores(const LeituraSensores &leitura);
+void tratarComandoControle(const ComandoControle &comando);
+void tratarTickCiclo();
+void atualizarSaidasControle(bool notificarConsumidoresAgora);
+void callbackTimerAmostragem(TimerHandle_t xTimer);
+void callbackTimerCiclo(TimerHandle_t xTimer);
+void callbackTimerPublicacao(TimerHandle_t xTimer);
+void tarefaSensores(void *pvParameters);
+void tarefaControle(void *pvParameters);
+void tarefaDisplay(void *pvParameters);
+void tarefaIoT(void *pvParameters);
 
-void failSafe(const char *message) {
-  (void) message;
+void falhaSegura(const char *mensagem) {
+  (void) mensagem;
 
   while (true) {
     vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 
-void buildTopics() {
-  snprintf(topicTemperature, sizeof(topicTemperature), "satc/g%d/telemetry/temperature", GROUP_ID);
-  snprintf(topicHumidity, sizeof(topicHumidity), "satc/g%d/telemetry/humidity", GROUP_ID);
-  snprintf(topicLuminosity, sizeof(topicLuminosity), "satc/g%d/telemetry/luminosity", GROUP_ID);
-  snprintf(topicLightCommand, sizeof(topicLightCommand), "satc/g%d/cmd/light", GROUP_ID);
-  snprintf(topicFocusStatus, sizeof(topicFocusStatus), "satc/g%d/status/focus", GROUP_ID);
-  snprintf(topicAlertStatus, sizeof(topicAlertStatus), "satc/g%d/status/alert", GROUP_ID);
+void montarTopicos() {
+  snprintf(topicoTemperatura, sizeof(topicoTemperatura), "satc/g%d/telemetria/temperatura", ID_GRUPO);
+  snprintf(topicoUmidade, sizeof(topicoUmidade), "satc/g%d/telemetria/umidade", ID_GRUPO);
+  snprintf(topicoLuminosidade, sizeof(topicoLuminosidade), "satc/g%d/telemetria/luminosidade", ID_GRUPO);
+  snprintf(topicoComandoLuz, sizeof(topicoComandoLuz), "satc/g%d/comando/luz", ID_GRUPO);
+  snprintf(topicoEstadoFoco, sizeof(topicoEstadoFoco), "satc/g%d/estado/foco", ID_GRUPO);
+  snprintf(topicoEstadoAlerta, sizeof(topicoEstadoAlerta), "satc/g%d/estado/alerta", ID_GRUPO);
 }
 
-void initializeSystemState() {
-  gSystemState.mode = MODE_IDLE;
-  gSystemState.displayMode = DISPLAY_TEMPERATURE;
-  gSystemState.relayOn = false;
-  gSystemState.manualOverrideEnabled = false;
-  gSystemState.manualOverrideState = false;
-  gSystemState.thresholds.luminosityPercent = DEFAULT_LUMINOSITY_THRESHOLD;
-  gSystemState.thresholds.humidityPercent = DEFAULT_HUMIDITY_ALERT_THRESHOLD;
-  gSystemState.focusDurationSeconds = DEFAULT_FOCUS_DURATION_SECONDS;
-  gSystemState.pauseDurationSeconds = DEFAULT_PAUSE_DURATION_SECONDS;
-  gSystemState.countdownSeconds = DEFAULT_FOCUS_DURATION_SECONDS;
-  gSystemState.connectivity.wifiConnected = false;
-  gSystemState.connectivity.mqttConnected = false;
-  gSystemState.lastSensors.temperatureC = 0.0f;
-  gSystemState.lastSensors.humidityPercent = 0.0f;
-  gSystemState.lastSensors.ldrRaw = 0;
-  gSystemState.lastSensors.ldrPercent = 0;
-  gSystemState.lastSensors.dhtOk = false;
-  gSystemState.lastSensors.timestampMs = 0;
+void inicializarEstadoSistema() {
+  gEstadoSistema.modo = MODO_OCIOSO;
+  gEstadoSistema.modoExibicao = EXIBICAO_TEMPERATURA;
+  gEstadoSistema.releLigado = false;
+  gEstadoSistema.controleManualAtivo = false;
+  gEstadoSistema.estadoControleManual = false;
+  gEstadoSistema.limiares.luminosidadePercentual = LIMIAR_PADRAO_LUMINOSIDADE;
+  gEstadoSistema.limiares.umidadePercentual = LIMIAR_PADRAO_ALERTA_UMIDADE;
+  gEstadoSistema.duracaoFocoSegundos = DURACAO_PADRAO_FOCO_SEGUNDOS;
+  gEstadoSistema.duracaoPausaSegundos = DURACAO_PADRAO_PAUSA_SEGUNDOS;
+  gEstadoSistema.contagemRegressivaSegundos = DURACAO_PADRAO_FOCO_SEGUNDOS;
+  gEstadoSistema.conectividade.wifiConectado = false;
+  gEstadoSistema.conectividade.mqttConectado = false;
+  gEstadoSistema.ultimaLeituraSensores.temperaturaC = 0.0f;
+  gEstadoSistema.ultimaLeituraSensores.umidadePercentual = 0.0f;
+  gEstadoSistema.ultimaLeituraSensores.ldrBruto = 0;
+  gEstadoSistema.ultimaLeituraSensores.ldrPercentual = 0;
+  gEstadoSistema.ultimaLeituraSensores.dhtValido = false;
+  gEstadoSistema.ultimaLeituraSensores.instanteMs = 0;
 }
 
-void initializeDisplayHardware() {
+void inicializarHardwareDisplay() {
   for (int i = 0; i < 8; i++) {
-    pinMode(SEGMENT_PINS[i], OUTPUT);
-    applySegmentLevel(SEGMENT_PINS[i], false);
+    pinMode(PINOS_SEGMENTOS[i], OUTPUT);
+    aplicarNivelSegmento(PINOS_SEGMENTOS[i], false);
   }
 
   for (int i = 0; i < 2; i++) {
-    pinMode(DISPLAY_PINS[i], OUTPUT);
-    applyDigitLevel(DISPLAY_PINS[i], false);
+    pinMode(PINOS_DIGITOS[i], OUTPUT);
+    aplicarNivelDigito(PINOS_DIGITOS[i], false);
   }
 
-  disableDisplays();
+  desabilitarDisplays();
 }
 
-void initializeButtonsAndLeds() {
+void inicializarBotoesELeds() {
   for (int i = 0; i < 4; i++) {
-    if (SHARE_LED_PINS_AS_BUTTONS) {
-      pinMode(BUTTON_PINS[i], INPUT_PULLUP);
-      buttonLastReadings[i] = digitalRead(BUTTON_PINS[i]);
-      buttonStableStates[i] = buttonLastReadings[i];
-      ledStates[i] = false;
+    if (COMPARTILHAR_PINOS_LEDS_COM_BOTOES) {
+      pinMode(PINOS_BOTOES[i], INPUT_PULLUP);
+      ultimasLeiturasBotoes[i] = digitalRead(PINOS_BOTOES[i]);
+      estadosEstaveisBotoes[i] = ultimasLeiturasBotoes[i];
+      estadosLeds[i] = false;
     } else {
-      pinMode(LED_PINS[i], OUTPUT);
-      digitalWrite(LED_PINS[i], LOW);
+      pinMode(PINOS_LEDS[i], OUTPUT);
+      digitalWrite(PINOS_LEDS[i], LOW);
     }
   }
 
-  if (SHARE_LED_PINS_AS_BUTTONS) {
-    refreshSharedLedOutputs();
+  if (COMPARTILHAR_PINOS_LEDS_COM_BOTOES) {
+    atualizarSaidasCompartilhadasLeds();
   }
 }
 
-void configureSharedPinsAsInput() {
+void configurarPinosCompartilhadosComoEntrada() {
   for (int i = 0; i < 4; i++) {
-    pinMode(BUTTON_PINS[i], INPUT_PULLUP);
+    pinMode(PINOS_BOTOES[i], INPUT_PULLUP);
   }
 }
 
-void refreshSharedLedOutputs() {
-  if (!SHARE_LED_PINS_AS_BUTTONS) {
+void atualizarSaidasCompartilhadasLeds() {
+  if (!COMPARTILHAR_PINOS_LEDS_COM_BOTOES) {
     return;
   }
 
   for (int i = 0; i < 4; i++) {
-    pinMode(LED_PINS[i], OUTPUT);
-    digitalWrite(LED_PINS[i], ledStates[i] ? HIGH : LOW);
+    pinMode(PINOS_LEDS[i], OUTPUT);
+    digitalWrite(PINOS_LEDS[i], estadosLeds[i] ? HIGH : LOW);
   }
 
-  delayMicroseconds(SHARED_PIN_OUTPUT_TIME_US);
-  configureSharedPinsAsInput();
+  delayMicroseconds(TEMPO_SAIDA_PINO_COMPARTILHADO_US);
+  configurarPinosCompartilhadosComoEntrada();
 }
 
-void updateOutputCacheFromState(const SystemState &state) {
-  ledStates[0] = state.mode == MODE_FOCUS;
-  ledStates[1] = state.mode == MODE_PAUSE;
-  ledStates[2] = state.connectivity.wifiConnected && state.connectivity.mqttConnected;
-  ledStates[3] = computeAlertState(state) != ALERT_OK;
+void atualizarCacheSaidasComEstado(const EstadoSistema &estado) {
+  estadosLeds[0] = estado.modo == MODO_FOCO;
+  estadosLeds[1] = estado.modo == MODO_PAUSA;
+  estadosLeds[2] = estado.conectividade.wifiConectado && estado.conectividade.mqttConectado;
+  estadosLeds[3] = calcularEstadoAlerta(estado) != ALERTA_OK;
 }
 
-void applySegmentLevel(int pin, bool active) {
-  digitalWrite(pin, active == DISPLAY_SEGMENT_ACTIVE_HIGH ? HIGH : LOW);
+void aplicarNivelSegmento(int pino, bool ativo) {
+  digitalWrite(pino, ativo == DISPLAY_SEGMENTO_ATIVO_ALTO ? HIGH : LOW);
 }
 
-void applyDigitLevel(int pin, bool active) {
-  bool level = active ? !DISPLAY_DIGIT_ACTIVE_LOW : DISPLAY_DIGIT_ACTIVE_LOW;
-  digitalWrite(pin, level ? HIGH : LOW);
+void aplicarNivelDigito(int pino, bool ativo) {
+  bool nivel = ativo ? !DISPLAY_DIGITO_ATIVO_BAIXO : DISPLAY_DIGITO_ATIVO_BAIXO;
+  digitalWrite(pino, nivel ? HIGH : LOW);
 }
 
-void disableDisplays() {
+void desabilitarDisplays() {
   for (int i = 0; i < 2; i++) {
-    applyDigitLevel(DISPLAY_PINS[i], false);
+    aplicarNivelDigito(PINOS_DIGITOS[i], false);
   }
 }
 
-void writeDigitPattern(int value, bool decimalPoint) {
-  if (value < 0 || value > 9) {
+void escreverPadraoDigito(int valor, bool pontoDecimal) {
+  if (valor < 0 || valor > 9) {
     for (int i = 0; i < 8; i++) {
-      applySegmentLevel(SEGMENT_PINS[i], false);
+      aplicarNivelSegmento(PINOS_SEGMENTOS[i], false);
     }
     return;
   }
 
   for (int i = 0; i < 7; i++) {
-    applySegmentLevel(SEGMENT_PINS[i], DIGIT_PATTERNS[value][i] == 1);
+    aplicarNivelSegmento(PINOS_SEGMENTOS[i], PADROES_DIGITOS[valor][i] == 1);
   }
 
-  applySegmentLevel(SEG_DP, decimalPoint);
+  aplicarNivelSegmento(SEG_DP, pontoDecimal);
 }
 
-int computeDisplayValue(const SystemState &state) {
-  if (state.mode == MODE_FOCUS || state.mode == MODE_PAUSE) {
-    uint32_t longestDuration = max(state.focusDurationSeconds, state.pauseDurationSeconds);
+int calcularValorExibicao(const EstadoSistema &estado) {
+  if (estado.modo == MODO_FOCO || estado.modo == MODO_PAUSA) {
+    uint32_t maiorDuracao = max(estado.duracaoFocoSegundos, estado.duracaoPausaSegundos);
 
-    if (longestDuration <= 99) {
-      return constrain(static_cast<int>(state.countdownSeconds), 0, 99);
+    if (maiorDuracao <= 99) {
+      return constrain(static_cast<int>(estado.contagemRegressivaSegundos), 0, 99);
     }
 
-    uint32_t minutesRemaining = (state.countdownSeconds + 59UL) / 60UL;
-    return constrain(static_cast<int>(minutesRemaining), 0, 99);
+    uint32_t minutosRestantes = (estado.contagemRegressivaSegundos + 59UL) / 60UL;
+    return constrain(static_cast<int>(minutosRestantes), 0, 99);
   }
 
-  switch (state.displayMode) {
-    case DISPLAY_HUMIDITY:
-      return constrain(static_cast<int>(round(state.lastSensors.humidityPercent)), 0, 99);
-    case DISPLAY_LUMINOSITY:
-      return constrain(state.lastSensors.ldrPercent, 0, 99);
-    case DISPLAY_TEMPERATURE:
+  switch (estado.modoExibicao) {
+    case EXIBICAO_UMIDADE:
+      return constrain(static_cast<int>(round(estado.ultimaLeituraSensores.umidadePercentual)), 0, 99);
+    case EXIBICAO_LUMINOSIDADE:
+      return constrain(estado.ultimaLeituraSensores.ldrPercentual, 0, 99);
+    case EXIBICAO_TEMPERATURA:
     default:
-      return constrain(static_cast<int>(round(state.lastSensors.temperatureC)), 0, 99);
+      return constrain(static_cast<int>(round(estado.ultimaLeituraSensores.temperaturaC)), 0, 99);
   }
 }
 
-void multiplexDisplay(const SystemState &state) {
-  static int activeDigit = 0;
+void multiplexarDisplay(const EstadoSistema &estado) {
+  static int digitoAtivo = 0;
 
-  const int displayValue = computeDisplayValue(state);
-  const int tens = displayValue / 10;
-  const int units = displayValue % 10;
+  const int valorExibicao = calcularValorExibicao(estado);
+  const int dezenas = valorExibicao / 10;
+  const int unidades = valorExibicao % 10;
 
-  disableDisplays();
+  desabilitarDisplays();
 
-  if (activeDigit == 0) {
-    writeDigitPattern(tens, false);
-    applyDigitLevel(DISPLAY_1, true);
+  if (digitoAtivo == 0) {
+    escreverPadraoDigito(dezenas, false);
+    aplicarNivelDigito(DIGITO_1, true);
   } else {
-    writeDigitPattern(units, false);
-    applyDigitLevel(DISPLAY_2, true);
+    escreverPadraoDigito(unidades, false);
+    aplicarNivelDigito(DIGITO_2, true);
   }
 
-  activeDigit = 1 - activeDigit;
-  vTaskDelay(pdMS_TO_TICKS(DISPLAY_DIGIT_HOLD_MS));
+  digitoAtivo = 1 - digitoAtivo;
+  vTaskDelay(pdMS_TO_TICKS(INTERVALO_RETENCAO_DIGITO_MS));
 }
 
-void copySystemState(SystemState &destination) {
+void copiarEstadoSistema(EstadoSistema &destino) {
   xSemaphoreTake(mutexEstado, portMAX_DELAY);
-  destination = gSystemState;
+  destino = gEstadoSistema;
   xSemaphoreGive(mutexEstado);
 }
 
-const char *focusModeToText(FocusMode mode) {
-  switch (mode) {
-    case MODE_FOCUS:
-      return "FOCUS";
-    case MODE_PAUSE:
-      return "PAUSE";
-    case MODE_IDLE:
+const char *modoFocoParaTexto(ModoFoco modo) {
+  switch (modo) {
+    case MODO_FOCO:
+      return "FOCO";
+    case MODO_PAUSA:
+      return "PAUSA";
+    case MODO_OCIOSO:
     default:
-      return "IDLE";
+      return "OCIOSO";
   }
 }
 
-const char *displayModeToText(DisplayMode mode) {
-  switch (mode) {
-    case DISPLAY_HUMIDITY:
-      return "HUMIDITY";
-    case DISPLAY_LUMINOSITY:
-      return "LUMINOSITY";
-    case DISPLAY_TEMPERATURE:
+const char *modoExibicaoParaTexto(ModoExibicao modo) {
+  switch (modo) {
+    case EXIBICAO_UMIDADE:
+      return "UMIDADE";
+    case EXIBICAO_LUMINOSIDADE:
+      return "LUMINOSIDADE";
+    case EXIBICAO_TEMPERATURA:
     default:
-      return "TEMPERATURE";
+      return "TEMPERATURA";
   }
 }
 
-AlertState computeAlertState(const SystemState &state) {
-  if (!state.lastSensors.dhtOk) {
-    return ALERT_WARN;
+EstadoAlerta calcularEstadoAlerta(const EstadoSistema &estado) {
+  if (!estado.ultimaLeituraSensores.dhtValido) {
+    return ALERTA_AVISO;
   }
 
-  if (state.lastSensors.temperatureC > DEFAULT_TEMPERATURE_ALERT_C ||
-      state.lastSensors.humidityPercent < state.thresholds.humidityPercent) {
-    return ALERT_ACTIVE;
+  if (estado.ultimaLeituraSensores.temperaturaC > TEMPERATURA_PADRAO_ALERTA_C ||
+      estado.ultimaLeituraSensores.umidadePercentual < estado.limiares.umidadePercentual) {
+    return ALERTA_ATIVO;
   }
 
-  return ALERT_OK;
+  return ALERTA_OK;
 }
 
-const char *alertStateToText(AlertState alertState) {
-  switch (alertState) {
-    case ALERT_WARN:
-      return "WARN";
-    case ALERT_ACTIVE:
-      return "ALERT";
-    case ALERT_OK:
+const char *estadoAlertaParaTexto(EstadoAlerta estadoAlerta) {
+  switch (estadoAlerta) {
+    case ALERTA_AVISO:
+      return "AVISO";
+    case ALERTA_ATIVO:
+      return "ALERTA";
+    case ALERTA_OK:
     default:
       return "OK";
   }
 }
 
-bool payloadMeansOn(const String &payload) {
-  return payload.equalsIgnoreCase("ON") ||
+bool payloadSignificaLigar(const String &payload) {
+  return payload.equalsIgnoreCase("LIGAR") ||
+         payload.equalsIgnoreCase("LIGADO") ||
          payload.equalsIgnoreCase("1") ||
-         payload.equalsIgnoreCase("TRUE");
+         payload.equalsIgnoreCase("VERDADEIRO");
 }
 
-bool payloadMeansOff(const String &payload) {
-  return payload.equalsIgnoreCase("OFF") ||
+bool payloadSignificaDesligar(const String &payload) {
+  return payload.equalsIgnoreCase("DESLIGAR") ||
+         payload.equalsIgnoreCase("DESLIGADO") ||
          payload.equalsIgnoreCase("0") ||
-         payload.equalsIgnoreCase("FALSE");
+         payload.equalsIgnoreCase("FALSO");
 }
 
-void syncConnectivityState() {
-  const bool wifiConnected = WiFi.status() == WL_CONNECTED;
-  const bool mqttConnected = wifiConnected && mqttClient.connected();
-  bool changed = false;
+void sincronizarEstadoConectividade() {
+  const bool wifiConectado = WiFi.status() == WL_CONNECTED;
+  const bool mqttConectado = wifiConectado && clienteMqtt.connected();
+  bool houveMudanca = false;
 
   xSemaphoreTake(mutexEstado, portMAX_DELAY);
 
-  if (gSystemState.connectivity.wifiConnected != wifiConnected ||
-      gSystemState.connectivity.mqttConnected != mqttConnected) {
-    gSystemState.connectivity.wifiConnected = wifiConnected;
-    gSystemState.connectivity.mqttConnected = mqttConnected;
-    changed = true;
+  if (gEstadoSistema.conectividade.wifiConectado != wifiConectado ||
+      gEstadoSistema.conectividade.mqttConectado != mqttConectado) {
+    gEstadoSistema.conectividade.wifiConectado = wifiConectado;
+    gEstadoSistema.conectividade.mqttConectado = mqttConectado;
+    houveMudanca = true;
   }
 
   xSemaphoreGive(mutexEstado);
 
-  if (wifiConnected) {
+  if (wifiConectado) {
     xEventGroupSetBits(gEventos, BIT_WIFI_OK);
   } else {
     xEventGroupClearBits(gEventos, BIT_WIFI_OK);
   }
 
-  if (mqttConnected) {
+  if (mqttConectado) {
     xEventGroupSetBits(gEventos, BIT_MQTT_OK);
   } else {
     xEventGroupClearBits(gEventos, BIT_MQTT_OK);
   }
 
-  if (changed && taskControleHandle != NULL) {
-    xTaskNotify(taskControleHandle, NOTIFY_CONTROL_CONNECTIVITY, eSetBits);
+  if (houveMudanca && handleTarefaControle != NULL) {
+    xTaskNotify(handleTarefaControle, NOTIFICACAO_CONECTIVIDADE_CONTROLE, eSetBits);
   }
 }
 
-void syncStateEventBits(const SystemState &state) {
-  if (state.mode == MODE_FOCUS) {
-    xEventGroupSetBits(gEventos, BIT_FOCUS_ACTIVE);
+void sincronizarBitsEventosEstado(const EstadoSistema &estado) {
+  if (estado.modo == MODO_FOCO) {
+    xEventGroupSetBits(gEventos, BIT_FOCO_ATIVO);
   } else {
-    xEventGroupClearBits(gEventos, BIT_FOCUS_ACTIVE);
+    xEventGroupClearBits(gEventos, BIT_FOCO_ATIVO);
   }
 
-  if (computeAlertState(state) == ALERT_OK) {
-    xEventGroupClearBits(gEventos, BIT_ALERT_ACTIVE);
+  if (calcularEstadoAlerta(estado) == ALERTA_OK) {
+    xEventGroupClearBits(gEventos, BIT_ALERTA_ATIVO);
   } else {
-    xEventGroupSetBits(gEventos, BIT_ALERT_ACTIVE);
+    xEventGroupSetBits(gEventos, BIT_ALERTA_ATIVO);
   }
 }
 
-void notifyStateConsumers() {
-  if (taskDisplayHandle != NULL) {
-    xTaskNotify(taskDisplayHandle, NOTIFY_DISPLAY_REFRESH, eSetBits);
+void notificarConsumidoresEstado() {
+  if (handleTarefaDisplay != NULL) {
+    xTaskNotify(handleTarefaDisplay, NOTIFICACAO_ATUALIZAR_DISPLAY, eSetBits);
   }
 
-  if (taskIoTHandle != NULL) {
-    xTaskNotify(taskIoTHandle, NOTIFY_IOT_STATE_CHANGED, eSetBits);
+  if (handleTarefaIoT != NULL) {
+    xTaskNotify(handleTarefaIoT, NOTIFICACAO_ESTADO_ALTERADO_IOT, eSetBits);
   }
 }
 
-void updateActuatorsFromState() {
-  SystemState snapshot;
-  copySystemState(snapshot);
+void atualizarAtuadoresComEstado() {
+  EstadoSistema estado;
+  copiarEstadoSistema(estado);
 
-  digitalWrite(RELE, snapshot.relayOn ? HIGH : LOW);
-  updateOutputCacheFromState(snapshot);
-  syncStateEventBits(snapshot);
+  digitalWrite(RELE, estado.releLigado ? HIGH : LOW);
+  atualizarCacheSaidasComEstado(estado);
+  sincronizarBitsEventosEstado(estado);
 }
 
-void applyLightingDecisionLocked() {
-  bool automaticRelay =
-    gSystemState.mode == MODE_FOCUS &&
-    gSystemState.lastSensors.ldrPercent < gSystemState.thresholds.luminosityPercent;
+void aplicarDecisaoIluminacaoTravado() {
+  bool releAutomatico =
+    gEstadoSistema.modo == MODO_FOCO &&
+    gEstadoSistema.ultimaLeituraSensores.ldrPercentual < gEstadoSistema.limiares.luminosidadePercentual;
 
-  if (gSystemState.manualOverrideEnabled) {
-    gSystemState.relayOn = gSystemState.manualOverrideState;
+  if (gEstadoSistema.controleManualAtivo) {
+    gEstadoSistema.releLigado = gEstadoSistema.estadoControleManual;
   } else {
-    gSystemState.relayOn = automaticRelay;
+    gEstadoSistema.releLigado = releAutomatico;
   }
 }
 
-void setModeLocked(FocusMode nextMode) {
-  gSystemState.mode = nextMode;
+void definirModoTravado(ModoFoco proximoModo) {
+  gEstadoSistema.modo = proximoModo;
 
-  switch (nextMode) {
-    case MODE_FOCUS:
-      gSystemState.countdownSeconds = gSystemState.focusDurationSeconds;
+  switch (proximoModo) {
+    case MODO_FOCO:
+      gEstadoSistema.contagemRegressivaSegundos = gEstadoSistema.duracaoFocoSegundos;
       break;
-    case MODE_PAUSE:
-      gSystemState.countdownSeconds = gSystemState.pauseDurationSeconds;
+    case MODO_PAUSA:
+      gEstadoSistema.contagemRegressivaSegundos = gEstadoSistema.duracaoPausaSegundos;
       break;
-    case MODE_IDLE:
+    case MODO_OCIOSO:
     default:
-      gSystemState.countdownSeconds = gSystemState.focusDurationSeconds;
+      gEstadoSistema.contagemRegressivaSegundos = gEstadoSistema.duracaoFocoSegundos;
       break;
   }
 }
 
-bool enqueueControlCommand(const ControlCommand &command, TickType_t ticksToWait) {
-  if (qControlCommands == NULL) {
+bool enfileirarComandoControle(const ComandoControle &comando, TickType_t ticksDeEspera) {
+  if (qComandosControle == NULL) {
     return false;
   }
 
-  return xQueueSend(qControlCommands, &command, ticksToWait) == pdPASS;
+  return xQueueSend(qComandosControle, &comando, ticksDeEspera) == pdPASS;
 }
 
-String buildStatusJson() {
-  SystemState state;
-  copySystemState(state);
-  const EventBits_t eventBits = xEventGroupGetBits(gEventos);
+String montarJsonEstado() {
+  EstadoSistema estado;
+  copiarEstadoSistema(estado);
+  const EventBits_t bitsEventos = xEventGroupGetBits(gEventos);
 
-  String json = "{";
-  json += "\"mode\":\"";
-  json += focusModeToText(state.mode);
-  json += "\",\"displayMode\":\"";
-  json += displayModeToText(state.displayMode);
-  json += "\",\"relayOn\":";
-  json += state.relayOn ? "true" : "false";
-  json += ",\"manualOverrideEnabled\":";
-  json += state.manualOverrideEnabled ? "true" : "false";
-  json += ",\"manualOverrideState\":";
-  json += state.manualOverrideState ? "true" : "false";
-  json += ",\"countdownSeconds\":";
-  json += String(state.countdownSeconds);
-  json += ",\"durations\":{\"focusSeconds\":";
-  json += String(state.focusDurationSeconds);
-  json += ",\"pauseSeconds\":";
-  json += String(state.pauseDurationSeconds);
-  json += "},\"thresholds\":{\"luminosity\":";
-  json += String(state.thresholds.luminosityPercent);
-  json += ",\"humidity\":";
-  json += String(state.thresholds.humidityPercent);
-  json += ",\"temperature\":";
-  json += String(DEFAULT_TEMPERATURE_ALERT_C);
-  json += "},\"connectivity\":{\"wifi\":";
-  json += state.connectivity.wifiConnected ? "true" : "false";
-  json += ",\"mqtt\":";
-  json += state.connectivity.mqttConnected ? "true" : "false";
-  json += "},\"events\":{\"wifiOk\":";
-  json += (eventBits & BIT_WIFI_OK) ? "true" : "false";
-  json += ",\"mqttOk\":";
-  json += (eventBits & BIT_MQTT_OK) ? "true" : "false";
-  json += ",\"focusActive\":";
-  json += (eventBits & BIT_FOCUS_ACTIVE) ? "true" : "false";
-  json += ",\"alertActive\":";
-  json += (eventBits & BIT_ALERT_ACTIVE) ? "true" : "false";
-  json += "},\"sensors\":{\"temperature\":";
-  json += state.lastSensors.dhtOk ? String(state.lastSensors.temperatureC, 1) : "null";
-  json += ",\"humidity\":";
-  json += state.lastSensors.dhtOk ? String(state.lastSensors.humidityPercent, 1) : "null";
-  json += ",\"luminosity\":";
-  json += String(state.lastSensors.ldrPercent);
-  json += ",\"luminosityRaw\":";
-  json += String(state.lastSensors.ldrRaw);
-  json += ",\"dhtOk\":";
-  json += state.lastSensors.dhtOk ? "true" : "false";
-  json += ",\"timestampMs\":";
-  json += String(state.lastSensors.timestampMs);
-  json += "},\"alert\":\"";
-  json += alertStateToText(computeAlertState(state));
-  json += "\"}";
+  String jsonEstado = "{";
+  jsonEstado += "\"modo\":\"";
+  jsonEstado += modoFocoParaTexto(estado.modo);
+  jsonEstado += "\",\"modoExibicao\":\"";
+  jsonEstado += modoExibicaoParaTexto(estado.modoExibicao);
+  jsonEstado += "\",\"releLigado\":";
+  jsonEstado += estado.releLigado ? "true" : "false";
+  jsonEstado += ",\"controleManualAtivo\":";
+  jsonEstado += estado.controleManualAtivo ? "true" : "false";
+  jsonEstado += ",\"estadoControleManual\":";
+  jsonEstado += estado.estadoControleManual ? "true" : "false";
+  jsonEstado += ",\"contagemRegressivaSegundos\":";
+  jsonEstado += String(estado.contagemRegressivaSegundos);
+  jsonEstado += ",\"duracoes\":{\"focoSegundos\":";
+  jsonEstado += String(estado.duracaoFocoSegundos);
+  jsonEstado += ",\"pausaSegundos\":";
+  jsonEstado += String(estado.duracaoPausaSegundos);
+  jsonEstado += "},\"limiares\":{\"luminosidade\":";
+  jsonEstado += String(estado.limiares.luminosidadePercentual);
+  jsonEstado += ",\"umidade\":";
+  jsonEstado += String(estado.limiares.umidadePercentual);
+  jsonEstado += ",\"temperatura\":";
+  jsonEstado += String(TEMPERATURA_PADRAO_ALERTA_C);
+  jsonEstado += "},\"conectividade\":{\"wifi\":";
+  jsonEstado += estado.conectividade.wifiConectado ? "true" : "false";
+  jsonEstado += ",\"mqtt\":";
+  jsonEstado += estado.conectividade.mqttConectado ? "true" : "false";
+  jsonEstado += "},\"eventos\":{\"wifiOk\":";
+  jsonEstado += (bitsEventos & BIT_WIFI_OK) ? "true" : "false";
+  jsonEstado += ",\"mqttOk\":";
+  jsonEstado += (bitsEventos & BIT_MQTT_OK) ? "true" : "false";
+  jsonEstado += ",\"focoAtivo\":";
+  jsonEstado += (bitsEventos & BIT_FOCO_ATIVO) ? "true" : "false";
+  jsonEstado += ",\"alertaAtivo\":";
+  jsonEstado += (bitsEventos & BIT_ALERTA_ATIVO) ? "true" : "false";
+  jsonEstado += "},\"sensores\":{\"temperatura\":";
+  jsonEstado += estado.ultimaLeituraSensores.dhtValido ? String(estado.ultimaLeituraSensores.temperaturaC, 1) : "null";
+  jsonEstado += ",\"umidade\":";
+  jsonEstado += estado.ultimaLeituraSensores.dhtValido ? String(estado.ultimaLeituraSensores.umidadePercentual, 1) : "null";
+  jsonEstado += ",\"luminosidade\":";
+  jsonEstado += String(estado.ultimaLeituraSensores.ldrPercentual);
+  jsonEstado += ",\"luminosidadeBruta\":";
+  jsonEstado += String(estado.ultimaLeituraSensores.ldrBruto);
+  jsonEstado += ",\"dhtValido\":";
+  jsonEstado += estado.ultimaLeituraSensores.dhtValido ? "true" : "false";
+  jsonEstado += ",\"instanteMs\":";
+  jsonEstado += String(estado.ultimaLeituraSensores.instanteMs);
+  jsonEstado += "},\"alerta\":\"";
+  jsonEstado += estadoAlertaParaTexto(calcularEstadoAlerta(estado));
+  jsonEstado += "\"}";
 
-  return json;
+  return jsonEstado;
 }
 
-String buildHtmlPage() {
-  SystemState state;
-  copySystemState(state);
+String montarPaginaHtml() {
+  EstadoSistema estado;
+  copiarEstadoSistema(estado);
 
-  String html = R"rawliteral(
+  String paginaHtml = R"rawliteral(
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PROVA04 Smart Desk FreeRTOS</title>
+  <title>PROVA04 Bancada Inteligente com FreeRTOS</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 24px; background: #f4f7fb; color: #10233a; }
     main { max-width: 920px; margin: 0 auto; background: #ffffff; border-radius: 18px; padding: 24px; box-shadow: 0 14px 40px rgba(16, 35, 58, 0.12); }
@@ -704,616 +717,649 @@ String buildHtmlPage() {
 <body>
   <main>
     <h1>PROVA04 - Estacao de Trabalho IoT com FreeRTOS</h1>
-    <p class="meta">Use <code>/status</code> para JSON e <code>/config?lux=40&humidity=30&focus=25&pause=5</code> para ajustes em segundos.</p>
+    <p class="meta">Use <code>/estado</code> para JSON e <code>/configuracao?luminosidade=40&umidade=30&foco=25&pausa=5</code> para ajustes em segundos.</p>
     <div class="grid">
   )rawliteral";
 
-  html += "<section class=\"card\"><div class=\"label\">Modo</div><div class=\"value\">";
-  html += focusModeToText(state.mode);
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Modo</div><div class=\"value\">";
+  paginaHtml += modoFocoParaTexto(estado.modo);
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Tempo restante</div><div class=\"value\">";
-  html += String(state.countdownSeconds);
-  html += " s</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Tempo restante</div><div class=\"value\">";
+  paginaHtml += String(estado.contagemRegressivaSegundos);
+  paginaHtml += " s</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Temperatura</div><div class=\"value\">";
-  html += state.lastSensors.dhtOk ? String(state.lastSensors.temperatureC, 1) + " C" : "--";
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Temperatura</div><div class=\"value\">";
+  paginaHtml += estado.ultimaLeituraSensores.dhtValido ? String(estado.ultimaLeituraSensores.temperaturaC, 1) + " C" : "--";
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Umidade</div><div class=\"value\">";
-  html += state.lastSensors.dhtOk ? String(state.lastSensors.humidityPercent, 1) + " %" : "--";
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Umidade</div><div class=\"value\">";
+  paginaHtml += estado.ultimaLeituraSensores.dhtValido ? String(estado.ultimaLeituraSensores.umidadePercentual, 1) + " %" : "--";
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Luminosidade</div><div class=\"value\">";
-  html += String(state.lastSensors.ldrPercent) + " %";
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Luminosidade</div><div class=\"value\">";
+  paginaHtml += String(estado.ultimaLeituraSensores.ldrPercentual) + " %";
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Luminaria</div><div class=\"value\">";
-  html += state.relayOn ? "ON" : "OFF";
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Luminaria</div><div class=\"value\">";
+  paginaHtml += estado.releLigado ? "LIGADO" : "DESLIGADO";
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Override manual</div><div class=\"value\">";
-  html += state.manualOverrideEnabled ? "ATIVO" : "AUTO";
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Controle manual</div><div class=\"value\">";
+  paginaHtml += estado.controleManualAtivo ? "ATIVO" : "AUTOMATICO";
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Alerta</div><div class=\"value\">";
-  html += alertStateToText(computeAlertState(state));
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Alerta</div><div class=\"value\">";
+  paginaHtml += estadoAlertaParaTexto(calcularEstadoAlerta(estado));
+  paginaHtml += "</div></section>";
 
-  html += "<section class=\"card\"><div class=\"label\">Wi-Fi / MQTT</div><div class=\"value\">";
-  html += state.connectivity.wifiConnected ? "OK" : "OFF";
-  html += " / ";
-  html += state.connectivity.mqttConnected ? "OK" : "OFF";
-  html += "</div></section>";
+  paginaHtml += "<section class=\"card\"><div class=\"label\">Wi-Fi / MQTT</div><div class=\"value\">";
+  paginaHtml += estado.conectividade.wifiConectado ? "OK" : "SEM";
+  paginaHtml += " / ";
+  paginaHtml += estado.conectividade.mqttConectado ? "OK" : "SEM";
+  paginaHtml += "</div></section>";
 
-  html += R"rawliteral(
+  paginaHtml += R"rawliteral(
     </div>
   </main>
 </body>
 </html>
   )rawliteral";
 
-  return html;
+  return paginaHtml;
 }
 
-void configureHttpRoutes() {
-  if (httpRoutesConfigured) {
+void configurarRotasHttp() {
+  if (rotasHttpConfiguradas) {
     return;
   }
 
-  server.on("/", HTTP_GET, handleRoot);
-  server.on("/status", HTTP_GET, handleStatus);
-  server.on("/config", HTTP_GET, handleConfig);
-  server.onNotFound(handleNotFound);
-  httpRoutesConfigured = true;
+  servidor.on("/", HTTP_GET, tratarRaiz);
+  servidor.on("/estado", HTTP_GET, tratarEstado);
+  servidor.on("/configuracao", HTTP_GET, tratarConfiguracao);
+  servidor.onNotFound(tratarNaoEncontrado);
+  rotasHttpConfiguradas = true;
 }
 
-void startHttpServer() {
-  if (httpServerStarted) {
+void iniciarServidorHttp() {
+  if (servidorHttpIniciado) {
     return;
   }
 
-  configureHttpRoutes();
-  server.begin();
-  httpServerStarted = true;
+  configurarRotasHttp();
+  servidor.begin();
+  servidorHttpIniciado = true;
 }
 
-void handleRoot() {
-  server.send(200, "text/html; charset=utf-8", buildHtmlPage());
+void tratarRaiz() {
+  servidor.send(200, "text/html; charset=utf-8", montarPaginaHtml());
 }
 
-void handleStatus() {
-  server.send(200, "application/json", buildStatusJson());
+void tratarEstado() {
+  servidor.send(200, "application/json", montarJsonEstado());
 }
 
-void handleConfig() {
-  bool anyArgument = false;
-  bool success = true;
+void tratarConfiguracao() {
+  bool houveArgumento = false;
+  bool sucesso = true;
 
-  if (server.hasArg("lux")) {
-    ControlCommand command = {SOURCE_HTTP, ACTION_SET_LUX_THRESHOLD, server.arg("lux").toInt(), false};
-    success = enqueueControlCommand(command, pdMS_TO_TICKS(20)) && success;
-    anyArgument = true;
+  if (servidor.hasArg("luminosidade")) {
+    ComandoControle comando = {ORIGEM_HTTP, ACAO_DEFINIR_LIMIAR_LUMINOSIDADE, servidor.arg("luminosidade").toInt(), false};
+    sucesso = enfileirarComandoControle(comando, pdMS_TO_TICKS(20)) && sucesso;
+    houveArgumento = true;
   }
 
-  if (server.hasArg("humidity")) {
-    ControlCommand command = {SOURCE_HTTP, ACTION_SET_HUMIDITY_THRESHOLD, server.arg("humidity").toInt(), false};
-    success = enqueueControlCommand(command, pdMS_TO_TICKS(20)) && success;
-    anyArgument = true;
+  if (servidor.hasArg("umidade")) {
+    ComandoControle comando = {ORIGEM_HTTP, ACAO_DEFINIR_LIMIAR_UMIDADE, servidor.arg("umidade").toInt(), false};
+    sucesso = enfileirarComandoControle(comando, pdMS_TO_TICKS(20)) && sucesso;
+    houveArgumento = true;
   }
 
-  if (server.hasArg("focus")) {
-    ControlCommand command = {SOURCE_HTTP, ACTION_SET_FOCUS_SECONDS, server.arg("focus").toInt(), false};
-    success = enqueueControlCommand(command, pdMS_TO_TICKS(20)) && success;
-    anyArgument = true;
+  if (servidor.hasArg("foco")) {
+    ComandoControle comando = {ORIGEM_HTTP, ACAO_DEFINIR_SEGUNDOS_FOCO, servidor.arg("foco").toInt(), false};
+    sucesso = enfileirarComandoControle(comando, pdMS_TO_TICKS(20)) && sucesso;
+    houveArgumento = true;
   }
 
-  if (server.hasArg("pause")) {
-    ControlCommand command = {SOURCE_HTTP, ACTION_SET_PAUSE_SECONDS, server.arg("pause").toInt(), false};
-    success = enqueueControlCommand(command, pdMS_TO_TICKS(20)) && success;
-    anyArgument = true;
+  if (servidor.hasArg("pausa")) {
+    ComandoControle comando = {ORIGEM_HTTP, ACAO_DEFINIR_SEGUNDOS_PAUSA, servidor.arg("pausa").toInt(), false};
+    sucesso = enfileirarComandoControle(comando, pdMS_TO_TICKS(20)) && sucesso;
+    houveArgumento = true;
   }
 
-  if (anyArgument && taskControleHandle != NULL) {
-    xTaskNotify(taskControleHandle, NOTIFY_CONTROL_REMOTE_CMD, eSetBits);
+  if (houveArgumento && handleTarefaControle != NULL) {
+    xTaskNotify(handleTarefaControle, NOTIFICACAO_COMANDO_REMOTO_CONTROLE, eSetBits);
     vTaskDelay(pdMS_TO_TICKS(40));
   }
 
-  if (!success) {
-    server.send(503, "application/json", "{\"error\":\"command queue busy\"}");
+  if (!sucesso) {
+    servidor.send(503, "application/json", "{\"erro\":\"fila de comandos ocupada\"}");
     return;
   }
 
-  server.send(200, "application/json", buildStatusJson());
+  servidor.send(200, "application/json", montarJsonEstado());
 }
 
-void handleNotFound() {
-  server.send(404, "text/plain", "Rota nao encontrada.");
+void tratarNaoEncontrado() {
+  servidor.send(404, "text/plain", "Rota nao encontrada.");
 }
 
-void startWiFiConnection() {
+void limparTentativaConexaoWifi() {
+  perfilWifiAtivo = PERFIL_WIFI_NENHUM;
+  tentativaWifiIniciadaMs = 0;
+}
+
+void iniciarConexaoWifi(PerfilWifi perfil) {
   WiFi.disconnect(true);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD);
+
+  perfilWifiAtivo = perfil;
+  tentativaWifiIniciadaMs = millis();
+  ultimoCicloReconexaoWifiMs = 0;
+
+  if (perfil == PERFIL_WIFI_PRIMARIO) {
+    WiFi.begin(SSID_WIFI_PRIMARIO, SENHA_WIFI_PRIMARIO);
+    return;
+  }
+
+  WiFi.begin(SSID_WIFI_BACKUP, WPA2_AUTH_PEAP, IDENTIDADE_EAP, USUARIO_EAP, SENHA_EAP);
 }
 
-bool waitForWiFi(unsigned long timeoutMs) {
-  unsigned long startMs = millis();
+bool aguardarWifi(unsigned long timeoutMs) {
+  unsigned long inicioMs = millis();
 
-  while (WiFi.status() != WL_CONNECTED && millis() - startMs < timeoutMs) {
+  while (WiFi.status() != WL_CONNECTED && millis() - inicioMs < timeoutMs) {
     delay(500);
   }
 
   return WiFi.status() == WL_CONNECTED;
 }
 
-void maintainWiFiConnection() {
+void manterConexaoWifi() {
   if (WiFi.status() == WL_CONNECTED) {
-    if (!httpServerStarted) {
-      startHttpServer();
+    limparTentativaConexaoWifi();
+    ultimoCicloReconexaoWifiMs = 0;
+
+    if (!servidorHttpIniciado) {
+      iniciarServidorHttp();
     }
 
-    syncConnectivityState();
+    sincronizarEstadoConectividade();
     return;
   }
 
-  if (lastWiFiReconnectAttemptMs == 0 ||
-      millis() - lastWiFiReconnectAttemptMs >= WIFI_RETRY_INTERVAL_MS) {
-    lastWiFiReconnectAttemptMs = millis();
-    startWiFiConnection();
+  if (perfilWifiAtivo == PERFIL_WIFI_NENHUM) {
+    if (ultimoCicloReconexaoWifiMs == 0 ||
+        millis() - ultimoCicloReconexaoWifiMs >= WIFI_INTERVALO_RECONEXAO_MS) {
+      iniciarConexaoWifi(PERFIL_WIFI_PRIMARIO);
+    }
+
+    sincronizarEstadoConectividade();
+    return;
   }
 
-  syncConnectivityState();
+  if (millis() - tentativaWifiIniciadaMs >= WIFI_TIMEOUT_CONEXAO_MS) {
+    if (perfilWifiAtivo == PERFIL_WIFI_PRIMARIO) {
+      iniciarConexaoWifi(PERFIL_WIFI_BACKUP);
+    } else {
+      WiFi.disconnect(true);
+      WiFi.mode(WIFI_STA);
+      limparTentativaConexaoWifi();
+      ultimoCicloReconexaoWifiMs = millis();
+    }
+  }
+
+  sincronizarEstadoConectividade();
 }
 
-bool connectToMqttBroker() {
-  String clientId = "PROVA04-G" + String(GROUP_ID) + "-" + String((uint32_t)ESP.getEfuseMac(), HEX);
+bool conectarBrokerMqtt() {
+  String idCliente = "PROVA04-G" + String(ID_GRUPO) + "-" + String((uint32_t)ESP.getEfuseMac(), HEX);
 
-  bool connected = false;
+  bool conectado = false;
 
-  if (strlen(MQTT_USERNAME) > 0) {
-    connected = mqttClient.connect(clientId.c_str(), MQTT_USERNAME, MQTT_PASSWORD);
+  if (strlen(USUARIO_MQTT) > 0) {
+    conectado = clienteMqtt.connect(idCliente.c_str(), USUARIO_MQTT, SENHA_MQTT);
   } else {
-    connected = mqttClient.connect(clientId.c_str());
+    conectado = clienteMqtt.connect(idCliente.c_str());
   }
 
-  if (!connected) {
-    syncConnectivityState();
+  if (!conectado) {
+    sincronizarEstadoConectividade();
     return false;
   }
 
-  subscribeTopics();
-  syncConnectivityState();
-  publishStateToMqtt(true, true);
+  inscreverTopicos();
+  sincronizarEstadoConectividade();
+  publicarEstadoNoMqtt(true, true);
   return true;
 }
 
-void maintainMqttConnection() {
+void manterConexaoMqtt() {
   if (WiFi.status() != WL_CONNECTED) {
-    syncConnectivityState();
+    sincronizarEstadoConectividade();
     return;
   }
 
-  if (mqttClient.connected()) {
-    syncConnectivityState();
+  if (clienteMqtt.connected()) {
+    sincronizarEstadoConectividade();
     return;
   }
 
-  if (lastMqttReconnectAttemptMs == 0 ||
-      millis() - lastMqttReconnectAttemptMs >= MQTT_RETRY_INTERVAL_MS) {
-    lastMqttReconnectAttemptMs = millis();
-    connectToMqttBroker();
+  if (ultimaTentativaReconexaoMqttMs == 0 ||
+      millis() - ultimaTentativaReconexaoMqttMs >= MQTT_INTERVALO_RECONEXAO_MS) {
+    ultimaTentativaReconexaoMqttMs = millis();
+    conectarBrokerMqtt();
   }
 
-  syncConnectivityState();
+  sincronizarEstadoConectividade();
 }
 
-void subscribeTopics() {
-  mqttClient.subscribe(topicLightCommand);
+void inscreverTopicos() {
+  clienteMqtt.subscribe(topicoComandoLuz);
 }
 
-void mqttCallback(char *topic, byte *payload, unsigned int length) {
-  char messageBuffer[32];
-  const unsigned int copyLength = min(length, sizeof(messageBuffer) - 1U);
+void callbackMqtt(char *topico, byte *payload, unsigned int comprimento) {
+  char bufferMensagem[32];
+  const unsigned int tamanhoCopia = min(comprimento, sizeof(bufferMensagem) - 1U);
 
-  memcpy(messageBuffer, payload, copyLength);
-  messageBuffer[copyLength] = '\0';
+  memcpy(bufferMensagem, payload, tamanhoCopia);
+  bufferMensagem[tamanhoCopia] = '\0';
 
-  String message(messageBuffer);
+  String mensagem(bufferMensagem);
 
-  if (strcmp(topic, topicLightCommand) != 0) {
+  if (strcmp(topico, topicoComandoLuz) != 0) {
     return;
   }
 
-  ControlCommand command = {SOURCE_MQTT, ACTION_SET_LIGHT, 0, false};
+  ComandoControle comando = {ORIGEM_MQTT, ACAO_DEFINIR_LUZ, 0, false};
 
-  if (payloadMeansOn(message)) {
-    command.value = 1;
-    command.boolValue = true;
-  } else if (payloadMeansOff(message)) {
-    command.value = 0;
-    command.boolValue = false;
+  if (payloadSignificaLigar(mensagem)) {
+    comando.valor = 1;
+    comando.valorBooleano = true;
+  } else if (payloadSignificaDesligar(mensagem)) {
+    comando.valor = 0;
+    comando.valorBooleano = false;
   } else {
     return;
   }
 
-  if (enqueueControlCommand(command, 0) && taskControleHandle != NULL) {
-    xTaskNotify(taskControleHandle, NOTIFY_CONTROL_REMOTE_CMD, eSetBits);
+  if (enfileirarComandoControle(comando, 0) && handleTarefaControle != NULL) {
+    xTaskNotify(handleTarefaControle, NOTIFICACAO_COMANDO_REMOTO_CONTROLE, eSetBits);
   }
 }
 
-void publishTelemetrySnapshot(const SystemState &state) {
-  if (!mqttClient.connected()) {
+void publicarLeituraTelemetria(const EstadoSistema &estado) {
+  if (!clienteMqtt.connected()) {
     return;
   }
 
   char buffer[20];
 
-  dtostrf(state.lastSensors.temperatureC, 0, 1, buffer);
-  mqttClient.publish(topicTemperature, buffer, true);
+  dtostrf(estado.ultimaLeituraSensores.temperaturaC, 0, 1, buffer);
+  clienteMqtt.publish(topicoTemperatura, buffer, true);
 
-  dtostrf(state.lastSensors.humidityPercent, 0, 1, buffer);
-  mqttClient.publish(topicHumidity, buffer, true);
+  dtostrf(estado.ultimaLeituraSensores.umidadePercentual, 0, 1, buffer);
+  clienteMqtt.publish(topicoUmidade, buffer, true);
 
-  snprintf(buffer, sizeof(buffer), "%d", state.lastSensors.ldrPercent);
-  mqttClient.publish(topicLuminosity, buffer, true);
+  snprintf(buffer, sizeof(buffer), "%d", estado.ultimaLeituraSensores.ldrPercentual);
+  clienteMqtt.publish(topicoLuminosidade, buffer, true);
 }
 
-void publishStatusSnapshot(const SystemState &state, bool force) {
-  if (!mqttClient.connected()) {
+void publicarResumoStatus(const EstadoSistema &estado, bool forcar) {
+  if (!clienteMqtt.connected()) {
     return;
   }
 
-  const String focusText = String(focusModeToText(state.mode));
-  const String alertText = String(alertStateToText(computeAlertState(state)));
+  const String textoFoco = String(modoFocoParaTexto(estado.modo));
+  const String textoAlerta = String(estadoAlertaParaTexto(calcularEstadoAlerta(estado)));
 
-  if (force || focusText != lastPublishedFocus) {
-    mqttClient.publish(topicFocusStatus, focusText.c_str(), true);
-    lastPublishedFocus = focusText;
+  if (forcar || textoFoco != ultimoFocoPublicado) {
+    clienteMqtt.publish(topicoEstadoFoco, textoFoco.c_str(), true);
+    ultimoFocoPublicado = textoFoco;
   }
 
-  if (force || alertText != lastPublishedAlert) {
-    mqttClient.publish(topicAlertStatus, alertText.c_str(), true);
-    lastPublishedAlert = alertText;
+  if (forcar || textoAlerta != ultimoAlertaPublicado) {
+    clienteMqtt.publish(topicoEstadoAlerta, textoAlerta.c_str(), true);
+    ultimoAlertaPublicado = textoAlerta;
   }
 }
 
-void publishStateToMqtt(bool publishTelemetryNow, bool forceStatus) {
-  if (!mqttClient.connected()) {
+void publicarEstadoNoMqtt(bool publicarTelemetriaAgora, bool forcarStatus) {
+  if (!clienteMqtt.connected()) {
     return;
   }
 
-  SystemState state;
-  copySystemState(state);
+  EstadoSistema estado;
+  copiarEstadoSistema(estado);
 
-  if (publishTelemetryNow) {
-    publishTelemetrySnapshot(state);
+  if (publicarTelemetriaAgora) {
+    publicarLeituraTelemetria(estado);
   }
 
-  publishStatusSnapshot(state, forceStatus);
+  publicarResumoStatus(estado, forcarStatus);
 }
 
-void processButtonPress(int buttonIndex) {
-  bool stateChanged = false;
+void processarPressionamentoBotao(int indiceBotao) {
+  bool houveMudancaEstado = false;
 
   xSemaphoreTake(mutexEstado, portMAX_DELAY);
 
-  switch (buttonIndex) {
+  switch (indiceBotao) {
     case 0:
-      if (gSystemState.mode == MODE_IDLE || gSystemState.mode == MODE_PAUSE) {
-        setModeLocked(MODE_FOCUS);
+      if (gEstadoSistema.modo == MODO_OCIOSO || gEstadoSistema.modo == MODO_PAUSA) {
+        definirModoTravado(MODO_FOCO);
       } else {
-        setModeLocked(MODE_PAUSE);
+        definirModoTravado(MODO_PAUSA);
       }
-      stateChanged = true;
+      houveMudancaEstado = true;
       break;
 
     case 1:
-      gSystemState.manualOverrideEnabled = false;
-      gSystemState.manualOverrideState = false;
-      setModeLocked(MODE_IDLE);
-      stateChanged = true;
+      gEstadoSistema.controleManualAtivo = false;
+      gEstadoSistema.estadoControleManual = false;
+      definirModoTravado(MODO_OCIOSO);
+      houveMudancaEstado = true;
       break;
 
     case 2:
-      gSystemState.displayMode = static_cast<DisplayMode>((gSystemState.displayMode + 1) % 3);
-      stateChanged = true;
+      gEstadoSistema.modoExibicao = static_cast<ModoExibicao>((gEstadoSistema.modoExibicao + 1) % 3);
+      houveMudancaEstado = true;
       break;
 
     case 3:
-      if (gSystemState.manualOverrideEnabled) {
-        gSystemState.manualOverrideEnabled = false;
+      if (gEstadoSistema.controleManualAtivo) {
+        gEstadoSistema.controleManualAtivo = false;
       } else {
-        gSystemState.manualOverrideEnabled = true;
-        gSystemState.manualOverrideState = !gSystemState.relayOn;
+        gEstadoSistema.controleManualAtivo = true;
+        gEstadoSistema.estadoControleManual = !gEstadoSistema.releLigado;
       }
-      stateChanged = true;
+      houveMudancaEstado = true;
       break;
   }
 
-  if (stateChanged) {
-    applyLightingDecisionLocked();
+  if (houveMudancaEstado) {
+    aplicarDecisaoIluminacaoTravado();
   }
 
   xSemaphoreGive(mutexEstado);
 
-  if (stateChanged) {
-    refreshControlOutputs(true);
+  if (houveMudancaEstado) {
+    atualizarSaidasControle(true);
   }
 }
 
-void processButtons() {
-  if (!SHARE_LED_PINS_AS_BUTTONS) {
+void processarBotoes() {
+  if (!COMPARTILHAR_PINOS_LEDS_COM_BOTOES) {
     return;
   }
 
   for (int i = 0; i < 4; i++) {
-    bool reading = digitalRead(BUTTON_PINS[i]);
+    bool leitura = digitalRead(PINOS_BOTOES[i]);
 
-    if (reading != buttonLastReadings[i]) {
-      buttonLastReadings[i] = reading;
-      buttonLastDebounceMs[i] = millis();
+    if (leitura != ultimasLeiturasBotoes[i]) {
+      ultimasLeiturasBotoes[i] = leitura;
+      ultimosDebouncesBotoesMs[i] = millis();
     }
 
-    if (millis() - buttonLastDebounceMs[i] < BUTTON_DEBOUNCE_MS) {
+    if (millis() - ultimosDebouncesBotoesMs[i] < BOTAO_DEBOUNCE_MS) {
       continue;
     }
 
-    if (reading != buttonStableStates[i]) {
-      buttonStableStates[i] = reading;
+    if (leitura != estadosEstaveisBotoes[i]) {
+      estadosEstaveisBotoes[i] = leitura;
 
-      if (buttonStableStates[i] == LOW) {
-        processButtonPress(i);
+      if (estadosEstaveisBotoes[i] == LOW) {
+        processarPressionamentoBotao(i);
       }
     }
   }
 }
 
-void handleSensorSnapshot(const SensorSnapshot &snapshot) {
+void tratarLeituraSensores(const LeituraSensores &leitura) {
   xSemaphoreTake(mutexEstado, portMAX_DELAY);
-  gSystemState.lastSensors = snapshot;
-  applyLightingDecisionLocked();
+  gEstadoSistema.ultimaLeituraSensores = leitura;
+  aplicarDecisaoIluminacaoTravado();
   xSemaphoreGive(mutexEstado);
 
-  refreshControlOutputs(true);
+  atualizarSaidasControle(true);
 }
 
-void handleControlCommand(const ControlCommand &command) {
-  bool stateChanged = false;
+void tratarComandoControle(const ComandoControle &comando) {
+  bool houveMudancaEstado = false;
 
   xSemaphoreTake(mutexEstado, portMAX_DELAY);
 
-  switch (command.action) {
-    case ACTION_SET_LIGHT:
-      if (!gSystemState.manualOverrideEnabled ||
-          gSystemState.manualOverrideState != command.boolValue) {
-        gSystemState.manualOverrideEnabled = true;
-        gSystemState.manualOverrideState = command.boolValue;
-        stateChanged = true;
+  switch (comando.acao) {
+    case ACAO_DEFINIR_LUZ:
+      if (!gEstadoSistema.controleManualAtivo ||
+          gEstadoSistema.estadoControleManual != comando.valorBooleano) {
+        gEstadoSistema.controleManualAtivo = true;
+        gEstadoSistema.estadoControleManual = comando.valorBooleano;
+        houveMudancaEstado = true;
       }
       break;
 
-    case ACTION_SET_LUX_THRESHOLD:
-      gSystemState.thresholds.luminosityPercent = constrain(command.value, 0, 100);
-      stateChanged = true;
+    case ACAO_DEFINIR_LIMIAR_LUMINOSIDADE:
+      gEstadoSistema.limiares.luminosidadePercentual = constrain(comando.valor, 0, 100);
+      houveMudancaEstado = true;
       break;
 
-    case ACTION_SET_HUMIDITY_THRESHOLD:
-      gSystemState.thresholds.humidityPercent = constrain(command.value, 0, 100);
-      stateChanged = true;
+    case ACAO_DEFINIR_LIMIAR_UMIDADE:
+      gEstadoSistema.limiares.umidadePercentual = constrain(comando.valor, 0, 100);
+      houveMudancaEstado = true;
       break;
 
-    case ACTION_SET_FOCUS_SECONDS:
-      gSystemState.focusDurationSeconds = max(1, command.value);
-      if (gSystemState.mode == MODE_IDLE || gSystemState.mode == MODE_FOCUS) {
-        gSystemState.countdownSeconds = gSystemState.focusDurationSeconds;
+    case ACAO_DEFINIR_SEGUNDOS_FOCO:
+      gEstadoSistema.duracaoFocoSegundos = max(1, comando.valor);
+      if (gEstadoSistema.modo == MODO_OCIOSO || gEstadoSistema.modo == MODO_FOCO) {
+        gEstadoSistema.contagemRegressivaSegundos = gEstadoSistema.duracaoFocoSegundos;
       }
-      stateChanged = true;
+      houveMudancaEstado = true;
       break;
 
-    case ACTION_SET_PAUSE_SECONDS:
-      gSystemState.pauseDurationSeconds = max(1, command.value);
-      if (gSystemState.mode == MODE_PAUSE) {
-        gSystemState.countdownSeconds = gSystemState.pauseDurationSeconds;
+    case ACAO_DEFINIR_SEGUNDOS_PAUSA:
+      gEstadoSistema.duracaoPausaSegundos = max(1, comando.valor);
+      if (gEstadoSistema.modo == MODO_PAUSA) {
+        gEstadoSistema.contagemRegressivaSegundos = gEstadoSistema.duracaoPausaSegundos;
       }
-      stateChanged = true;
+      houveMudancaEstado = true;
       break;
   }
 
-  if (stateChanged) {
-    applyLightingDecisionLocked();
+  if (houveMudancaEstado) {
+    aplicarDecisaoIluminacaoTravado();
   }
 
   xSemaphoreGive(mutexEstado);
 
-  if (stateChanged) {
-    refreshControlOutputs(true);
+  if (houveMudancaEstado) {
+    atualizarSaidasControle(true);
   }
 }
 
-void handleCycleTick() {
-  bool stateChanged = false;
+void tratarTickCiclo() {
+  bool houveMudancaEstado = false;
 
   xSemaphoreTake(mutexEstado, portMAX_DELAY);
 
-  if (gSystemState.mode == MODE_FOCUS || gSystemState.mode == MODE_PAUSE) {
-    if (gSystemState.countdownSeconds > 0) {
-      gSystemState.countdownSeconds--;
-      stateChanged = true;
+  if (gEstadoSistema.modo == MODO_FOCO || gEstadoSistema.modo == MODO_PAUSA) {
+    if (gEstadoSistema.contagemRegressivaSegundos > 0) {
+      gEstadoSistema.contagemRegressivaSegundos--;
+      houveMudancaEstado = true;
     }
 
-    if (gSystemState.countdownSeconds == 0) {
-      if (gSystemState.mode == MODE_FOCUS) {
-        setModeLocked(MODE_PAUSE);
+    if (gEstadoSistema.contagemRegressivaSegundos == 0) {
+      if (gEstadoSistema.modo == MODO_FOCO) {
+        definirModoTravado(MODO_PAUSA);
       } else {
-        setModeLocked(MODE_FOCUS);
+        definirModoTravado(MODO_FOCO);
       }
-      stateChanged = true;
+      houveMudancaEstado = true;
     }
 
-    applyLightingDecisionLocked();
+    aplicarDecisaoIluminacaoTravado();
   }
 
   xSemaphoreGive(mutexEstado);
 
-  if (stateChanged) {
-    refreshControlOutputs(true);
+  if (houveMudancaEstado) {
+    atualizarSaidasControle(true);
   }
 }
 
-void refreshControlOutputs(bool notifyConsumersNow) {
-  updateActuatorsFromState();
+void atualizarSaidasControle(bool notificarConsumidoresAgora) {
+  atualizarAtuadoresComEstado();
 
-  if (notifyConsumersNow) {
-    notifyStateConsumers();
+  if (notificarConsumidoresAgora) {
+    notificarConsumidoresEstado();
   }
 }
 
-void callbackSampleTimer(TimerHandle_t xTimer) {
+void callbackTimerAmostragem(TimerHandle_t xTimer) {
   (void) xTimer;
 
-  if (taskSensoresHandle != NULL) {
-    xTaskNotify(taskSensoresHandle, NOTIFY_SENSOR_SAMPLE, eSetBits);
+  if (handleTarefaSensores != NULL) {
+    xTaskNotify(handleTarefaSensores, NOTIFICACAO_AMOSTRAGEM_SENSORES, eSetBits);
   }
 }
 
-void callbackCycleTimer(TimerHandle_t xTimer) {
+void callbackTimerCiclo(TimerHandle_t xTimer) {
   (void) xTimer;
 
-  if (taskControleHandle != NULL) {
-    xTaskNotify(taskControleHandle, NOTIFY_CONTROL_CYCLE_TICK, eSetBits);
+  if (handleTarefaControle != NULL) {
+    xTaskNotify(handleTarefaControle, NOTIFICACAO_TICK_CICLO_CONTROLE, eSetBits);
   }
 }
 
-void callbackPublishTimer(TimerHandle_t xTimer) {
+void callbackTimerPublicacao(TimerHandle_t xTimer) {
   (void) xTimer;
 
-  if (taskIoTHandle != NULL) {
-    xTaskNotify(taskIoTHandle, NOTIFY_IOT_PUBLISH, eSetBits);
+  if (handleTarefaIoT != NULL) {
+    xTaskNotify(handleTarefaIoT, NOTIFICACAO_PUBLICAR_IOT, eSetBits);
   }
 }
 
-void taskSensores(void *pvParameters) {
+void tarefaSensores(void *pvParameters) {
   (void) pvParameters;
 
-  float lastValidTemperature = 0.0f;
-  float lastValidHumidity = 0.0f;
+  float ultimaTemperaturaValida = 0.0f;
+  float ultimaUmidadeValida = 0.0f;
 
   while (true) {
-    uint32_t notificationValue = 0;
-    xTaskNotifyWait(0, 0xFFFFFFFFUL, &notificationValue, portMAX_DELAY);
+    uint32_t valorNotificacao = 0;
+    xTaskNotifyWait(0, 0xFFFFFFFFUL, &valorNotificacao, portMAX_DELAY);
 
-    if ((notificationValue & NOTIFY_SENSOR_SAMPLE) == 0) {
+    if ((valorNotificacao & NOTIFICACAO_AMOSTRAGEM_SENSORES) == 0) {
       continue;
     }
 
-    SensorSnapshot snapshot = {};
+    LeituraSensores leitura = {};
 
-    dht.read(DHT11_PIN);
+    sensorDht.read(PINO_DHT11);
 
-    snapshot.ldrRaw = analogRead(LDR_PIN);
-    snapshot.ldrPercent = map(snapshot.ldrRaw, 0, 4095, 100, 0);
-    snapshot.ldrPercent = constrain(snapshot.ldrPercent, 0, 100);
-    snapshot.timestampMs = millis();
+    leitura.ldrBruto = analogRead(PINO_LDR);
+    leitura.ldrPercentual = map(leitura.ldrBruto, 0, 4095, 100, 0);
+    leitura.ldrPercentual = constrain(leitura.ldrPercentual, 0, 100);
+    leitura.instanteMs = millis();
 
-    const float rawTemperature = dht.temperature;
-    const float rawHumidity = dht.humidity;
+    const float temperaturaBruta = sensorDht.temperature;
+    const float umidadeBruta = sensorDht.humidity;
 
-    snapshot.dhtOk =
-      rawTemperature > -40.0f && rawTemperature < 100.0f &&
-      rawHumidity >= 0.0f && rawHumidity <= 100.0f;
+    leitura.dhtValido =
+      temperaturaBruta > -40.0f && temperaturaBruta < 100.0f &&
+      umidadeBruta >= 0.0f && umidadeBruta <= 100.0f;
 
-    if (snapshot.dhtOk) {
-      lastValidTemperature = rawTemperature;
-      lastValidHumidity = rawHumidity;
+    if (leitura.dhtValido) {
+      ultimaTemperaturaValida = temperaturaBruta;
+      ultimaUmidadeValida = umidadeBruta;
     }
 
-    snapshot.temperatureC = lastValidTemperature;
-    snapshot.humidityPercent = lastValidHumidity;
+    leitura.temperaturaC = ultimaTemperaturaValida;
+    leitura.umidadePercentual = ultimaUmidadeValida;
 
-    xQueueOverwrite(qSensorSnapshots, &snapshot);
+    xQueueOverwrite(qLeiturasSensores, &leitura);
 
-    if (taskControleHandle != NULL) {
-      xTaskNotify(taskControleHandle, NOTIFY_CONTROL_SENSOR_DATA, eSetBits);
+    if (handleTarefaControle != NULL) {
+      xTaskNotify(handleTarefaControle, NOTIFICACAO_DADOS_SENSORES_CONTROLE, eSetBits);
     }
   }
 }
 
-void taskControle(void *pvParameters) {
+void tarefaControle(void *pvParameters) {
   (void) pvParameters;
 
-  refreshControlOutputs(true);
+  atualizarSaidasControle(true);
 
   while (true) {
-    uint32_t notificationValue = 0;
-    xTaskNotifyWait(0, 0xFFFFFFFFUL, &notificationValue, pdMS_TO_TICKS(CONTROL_LOOP_WAIT_MS));
+    uint32_t valorNotificacao = 0;
+    xTaskNotifyWait(0, 0xFFFFFFFFUL, &valorNotificacao, pdMS_TO_TICKS(INTERVALO_LOOP_CONTROLE_MS));
 
-    if (notificationValue & NOTIFY_CONTROL_CYCLE_TICK) {
-      handleCycleTick();
+    if (valorNotificacao & NOTIFICACAO_TICK_CICLO_CONTROLE) {
+      tratarTickCiclo();
     }
 
-    SensorSnapshot sensorSnapshot;
-    while (xQueueReceive(qSensorSnapshots, &sensorSnapshot, 0) == pdTRUE) {
-      handleSensorSnapshot(sensorSnapshot);
+    LeituraSensores leituraSensores;
+    while (xQueueReceive(qLeiturasSensores, &leituraSensores, 0) == pdTRUE) {
+      tratarLeituraSensores(leituraSensores);
     }
 
-    ControlCommand controlCommand;
-    while (xQueueReceive(qControlCommands, &controlCommand, 0) == pdTRUE) {
-      handleControlCommand(controlCommand);
+    ComandoControle comandoControle;
+    while (xQueueReceive(qComandosControle, &comandoControle, 0) == pdTRUE) {
+      tratarComandoControle(comandoControle);
     }
 
-    if (notificationValue & NOTIFY_CONTROL_CONNECTIVITY) {
-      refreshControlOutputs(false);
+    if (valorNotificacao & NOTIFICACAO_CONECTIVIDADE_CONTROLE) {
+      atualizarSaidasControle(false);
     }
 
-    refreshSharedLedOutputs();
-    processButtons();
+    atualizarSaidasCompartilhadasLeds();
+    processarBotoes();
   }
 }
 
-void taskDisplay(void *pvParameters) {
+void tarefaDisplay(void *pvParameters) {
   (void) pvParameters;
 
-  SystemState cachedState;
-  copySystemState(cachedState);
+  EstadoSistema estadoEmCache;
+  copiarEstadoSistema(estadoEmCache);
 
   while (true) {
-    uint32_t notificationValue = 0;
+    uint32_t valorNotificacao = 0;
 
-    if (xTaskNotifyWait(0, 0xFFFFFFFFUL, &notificationValue, 0) == pdTRUE) {
-      if (notificationValue & NOTIFY_DISPLAY_REFRESH) {
-        copySystemState(cachedState);
+    if (xTaskNotifyWait(0, 0xFFFFFFFFUL, &valorNotificacao, 0) == pdTRUE) {
+      if (valorNotificacao & NOTIFICACAO_ATUALIZAR_DISPLAY) {
+        copiarEstadoSistema(estadoEmCache);
       }
     }
 
-    multiplexDisplay(cachedState);
+    multiplexarDisplay(estadoEmCache);
   }
 }
 
-void taskIoT(void *pvParameters) {
+void tarefaIoT(void *pvParameters) {
   (void) pvParameters;
 
   while (true) {
-    uint32_t notificationValue = 0;
-    xTaskNotifyWait(0, 0xFFFFFFFFUL, &notificationValue, pdMS_TO_TICKS(IOT_LOOP_WAIT_MS));
+    uint32_t valorNotificacao = 0;
+    xTaskNotifyWait(0, 0xFFFFFFFFUL, &valorNotificacao, pdMS_TO_TICKS(INTERVALO_LOOP_IOT_MS));
 
-    maintainWiFiConnection();
-    maintainMqttConnection();
+    manterConexaoWifi();
+    manterConexaoMqtt();
 
-    if (mqttClient.connected()) {
-      mqttClient.loop();
+    if (clienteMqtt.connected()) {
+      clienteMqtt.loop();
     }
 
-    if (httpServerStarted && WiFi.status() == WL_CONNECTED) {
-      server.handleClient();
+    if (servidorHttpIniciado && WiFi.status() == WL_CONNECTED) {
+      servidor.handleClient();
     }
 
-    if (notificationValue & NOTIFY_IOT_PUBLISH) {
-      publishStateToMqtt(true, false);
+    if (valorNotificacao & NOTIFICACAO_PUBLICAR_IOT) {
+      publicarEstadoNoMqtt(true, false);
     }
 
-    if (notificationValue & NOTIFY_IOT_STATE_CHANGED) {
-      publishStateToMqtt(false, false);
+    if (valorNotificacao & NOTIFICACAO_ESTADO_ALTERADO_IOT) {
+      publicarEstadoNoMqtt(false, false);
     }
   }
 }
@@ -1323,56 +1369,69 @@ void setup() {
 
   pinMode(RELE, OUTPUT);
   digitalWrite(RELE, LOW);
-  pinMode(LDR_PIN, INPUT);
+  pinMode(PINO_LDR, INPUT);
   analogReadResolution(12);
 
-  initializeSystemState();
-  initializeDisplayHardware();
-  initializeButtonsAndLeds();
-  buildTopics();
-  configureHttpRoutes();
+  inicializarEstadoSistema();
+  inicializarHardwareDisplay();
+  inicializarBotoesELeds();
+  montarTopicos();
+  configurarRotasHttp();
 
-  qSensorSnapshots = xQueueCreate(SENSOR_QUEUE_LENGTH, sizeof(SensorSnapshot));
-  qControlCommands = xQueueCreate(CONTROL_QUEUE_LENGTH, sizeof(ControlCommand));
+  qLeiturasSensores = xQueueCreate(TAMANHO_FILA_SENSORES, sizeof(LeituraSensores));
+  qComandosControle = xQueueCreate(TAMANHO_FILA_CONTROLE, sizeof(ComandoControle));
   mutexEstado = xSemaphoreCreateMutex();
   gEventos = xEventGroupCreate();
 
-  tmrSample = xTimerCreate("Sample", pdMS_TO_TICKS(SENSOR_SAMPLE_INTERVAL_MS), pdTRUE, 0, callbackSampleTimer);
-  tmrCycleTick = xTimerCreate("CycleTick", pdMS_TO_TICKS(1000), pdTRUE, 0, callbackCycleTimer);
-  tmrPublish = xTimerCreate("Publish", pdMS_TO_TICKS(TELEMETRY_PUBLISH_INTERVAL_MS), pdTRUE, 0, callbackPublishTimer);
+  tmrAmostragem = xTimerCreate("Amostragem", pdMS_TO_TICKS(INTERVALO_AMOSTRAGEM_SENSORES_MS), pdTRUE, 0, callbackTimerAmostragem);
+  tmrTickCiclo = xTimerCreate("TickCiclo", pdMS_TO_TICKS(1000), pdTRUE, 0, callbackTimerCiclo);
+  tmrPublicacao = xTimerCreate("Publicacao", pdMS_TO_TICKS(INTERVALO_PUBLICACAO_TELEMETRIA_MS), pdTRUE, 0, callbackTimerPublicacao);
 
-  if (qSensorSnapshots == NULL || qControlCommands == NULL || mutexEstado == NULL ||
-      gEventos == NULL || tmrSample == NULL || tmrCycleTick == NULL || tmrPublish == NULL) {
-    failSafe("Falha ao criar queue, mutex, timers ou event group.");
+  if (qLeiturasSensores == NULL || qComandosControle == NULL || mutexEstado == NULL ||
+      gEventos == NULL || tmrAmostragem == NULL || tmrTickCiclo == NULL || tmrPublicacao == NULL) {
+    falhaSegura("Falha ao criar fila, mutex, timers ou event group.");
   }
 
-  mqttClient.setServer(MQTT_HOST, MQTT_PORT);
-  mqttClient.setCallback(mqttCallback);
-  mqttClient.setKeepAlive(MQTT_KEEP_ALIVE_SECONDS);
-  mqttClient.setSocketTimeout(MQTT_SOCKET_TIMEOUT_SECONDS);
-  espClient.setInsecure();
+  clienteMqtt.setServer(HOST_MQTT, PORTA_MQTT);
+  clienteMqtt.setCallback(callbackMqtt);
+  clienteMqtt.setKeepAlive(SEGUNDOS_KEEP_ALIVE_MQTT);
+  clienteMqtt.setSocketTimeout(SEGUNDOS_TIMEOUT_SOCKET_MQTT);
+  clienteEsp.setInsecure();
 
-  if (xTaskCreate(taskSensores, "TaskSensores", 4096, NULL, 2, &taskSensoresHandle) != pdPASS ||
-      xTaskCreate(taskControle, "TaskControle", 6144, NULL, 3, &taskControleHandle) != pdPASS ||
-      xTaskCreate(taskDisplay, "TaskDisplay", 3072, NULL, 2, &taskDisplayHandle) != pdPASS ||
-      xTaskCreate(taskIoT, "TaskIoT", 8192, NULL, 1, &taskIoTHandle) != pdPASS) {
-    failSafe("Falha ao criar as tasks do sistema.");
+  if (xTaskCreate(tarefaSensores, "TarefaSensores", 4096, NULL, 2, &handleTarefaSensores) != pdPASS ||
+      xTaskCreate(tarefaControle, "TarefaControle", 6144, NULL, 3, &handleTarefaControle) != pdPASS ||
+      xTaskCreate(tarefaDisplay, "TarefaDisplay", 3072, NULL, 2, &handleTarefaDisplay) != pdPASS ||
+      xTaskCreate(tarefaIoT, "TarefaIoT", 8192, NULL, 1, &handleTarefaIoT) != pdPASS) {
+    falhaSegura("Falha ao criar as tarefas do sistema.");
   }
 
-  if (xTimerStart(tmrSample, 0) != pdPASS ||
-      xTimerStart(tmrCycleTick, 0) != pdPASS ||
-      xTimerStart(tmrPublish, 0) != pdPASS) {
-    failSafe("Falha ao iniciar os software timers.");
+  if (xTimerStart(tmrAmostragem, 0) != pdPASS ||
+      xTimerStart(tmrTickCiclo, 0) != pdPASS ||
+      xTimerStart(tmrPublicacao, 0) != pdPASS) {
+    falhaSegura("Falha ao iniciar os software timers.");
   }
 
-  startWiFiConnection();
+  iniciarConexaoWifi(PERFIL_WIFI_PRIMARIO);
+  bool wifiConectado = aguardarWifi(WIFI_TIMEOUT_CONEXAO_MS);
 
-  if (waitForWiFi(WIFI_CONNECT_TIMEOUT_MS)) {
-    startHttpServer();
-    connectToMqttBroker();
+  if (!wifiConectado) {
+    iniciarConexaoWifi(PERFIL_WIFI_BACKUP);
+    wifiConectado = aguardarWifi(WIFI_TIMEOUT_CONEXAO_MS);
   }
 
-  refreshControlOutputs(true);
+  if (wifiConectado) {
+    limparTentativaConexaoWifi();
+    ultimoCicloReconexaoWifiMs = 0;
+    iniciarServidorHttp();
+    conectarBrokerMqtt();
+  } else {
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_STA);
+    limparTentativaConexaoWifi();
+    ultimoCicloReconexaoWifiMs = millis();
+  }
+
+  atualizarSaidasControle(true);
 }
 
 void loop() {

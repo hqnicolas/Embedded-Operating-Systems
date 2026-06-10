@@ -2,9 +2,9 @@
 
 ## Objetivo deste arquivo
 
-Este glossario resume os principais conceitos de `IoT` usados no projeto **Estacao de trabalho Inteligente IoT**.
+Este glossario resume os principais conceitos de `IoT` usados no projeto **Estacao de Trabalho Inteligente IoT**.
 
-## Conceitos Principais
+## Conceitos principais
 
 | Termo | Definicao | Aplicacao no projeto |
 | --- | --- | --- |
@@ -14,13 +14,13 @@ Este glossario resume os principais conceitos de `IoT` usados no projeto **Estac
 | `MQTT` | Protocolo leve de mensagens para IoT, baseado em `publish/subscribe`. | Usado para publicar leituras e receber comandos da luminaria. |
 | `Broker MQTT` | Servidor intermediario que recebe mensagens publicadas e distribui para os clientes inscritos. | Interliga `ESP32` e `Node-RED`. |
 | `Publish/Subscribe` | Modelo em que um dispositivo publica dados em topicos e outros dispositivos recebem se estiverem inscritos nesses topicos. | O `ESP32` publica telemetria e o `Node-RED` consome esses dados. |
-| `Dashboard` | Painel visual para monitoramento e interacao com os dados do sistema. | O `Node-RED` exibe sensores, modo e alerta. |
+| `Dashboard` | Painel visual para monitoramento e interacao com os dados do sistema. | O `Node-RED` exibe sensores, foco e alerta. |
 | `Node-RED` | Ferramenta visual de integracao por fluxos, muito usada em IoT para dashboards, automacoes e integracao entre servicos. | Mostra os dados, envia comandos e pode aplicar regras. |
-| `HTTP WebServer` | Servidor web embutido no dispositivo para responder requisicoes locais. | O `ESP32` disponibiliza as rotas `/` e `/status`. |
-| `Automacao` | Acao executada pelo sistema com base em uma regra predefinida, sem depender de comando manual a cada evento. | Quando a luminosidade cai no modo `FOCUS`, a luminaria pode ser ligada automaticamente. |
-| `Controle remoto` | Capacidade de enviar comandos ao dispositivo a distancia, pela rede. | O dashboard pode enviar `ON` e `OFF` para a luminaria. |
+| `HTTP WebServer` | Servidor web embutido no dispositivo para responder requisicoes locais. | O `ESP32` disponibiliza as rotas `/`, `/estado` e `/configuracao`. |
+| `Automacao` | Acao executada pelo sistema com base em uma regra predefinida, sem depender de comando manual a cada evento. | Quando a luminosidade cai no modo `FOCO`, a luminaria pode ser ligada automaticamente. |
+| `Controle remoto` | Capacidade de enviar comandos ao dispositivo a distancia, pela rede. | O dashboard pode enviar `LIGAR` e `DESLIGAR` para a luminaria. |
 
-## Stack Oficial do Projeto
+## Stack oficial do projeto
 
 O projeto adota a seguinte pilha de IoT:
 
@@ -45,26 +45,31 @@ O projeto adota a seguinte pilha de IoT:
 
 O `ESP32` publica:
 
-- `satc/gX/telemetry/temperature`
-- `satc/gX/telemetry/humidity`
-- `satc/gX/telemetry/luminosity`
-- `satc/gX/status/mode`
-- `satc/gX/status/alert`
+- `satc/gX/telemetria/temperatura`
+- `satc/gX/telemetria/umidade`
+- `satc/gX/telemetria/luminosidade`
+- `satc/gX/estado/foco`
+- `satc/gX/estado/alerta`
 
 ### Recebimento de comandos
 
 O `ESP32` assina:
 
-- `satc/gX/cmd/light`
+- `satc/gX/comando/luz`
 
-Assim, o dashboard pode enviar `ON` e `OFF` para a luminaria.
+Assim, o dashboard pode enviar `LIGAR` e `DESLIGAR` para a luminaria.
 
 ### Consulta local
 
 Sem depender do broker, o usuario ainda pode consultar o dispositivo pelas rotas:
 
 - `/`
-- `/status`
+- `/estado`
+- `/configuracao`
+
+### Conectividade Wi-Fi
+
+O firmware tenta primeiro a rede comum `Nicolas`. Se nao houver sucesso, usa `SATC 2.4` como acesso backup com autenticacao enterprise.
 
 ## Resumo
 

@@ -1,6 +1,6 @@
-# PROVA04 - Estacao de Trabalho IoT com FreeRTOS
+# PROVA04 - Firmware ESP32
 
-## Visao Geral
+## Visao geral
 
 Esta entrega implementa a `PROVA04` como uma estacao de trabalho inteligente baseada em `ESP32`, unindo:
 
@@ -8,19 +8,17 @@ Esta entrega implementa a `PROVA04` como uma estacao de trabalho inteligente bas
 - `MQTT + Node-RED + HTTP WebServer` como pilha oficial de IoT;
 - a mesma placa, shield e pinagem da `Internet-of-Things/AULA08`.
 
-A aplicacao monitora `temperatura`, `umidade` e `luminosidade`, controla um ciclo `FOCUS/PAUSE`, aciona uma luminaria por `rele`, publica telemetria por `MQTT`, mostra status em `HTTP` e aceita comando remoto pelo dashboard.
+A aplicacao monitora `temperatura`, `umidade` e `luminosidade`, controla um ciclo `FOCO/PAUSA`, aciona uma luminaria por `rele`, publica telemetria por `MQTT`, mostra estado em `HTTP` e aceita comando remoto pelo dashboard.
 
-## Arquivos da Entrega
+## Arquivos da entrega
 
-- `ESP32/PROVA04.ino`: firmware principal da prova com arquitetura explicita em `FreeRTOS`
-- `fluxo-node-red.json`: dashboard e automacao base para o `Node-RED`
-- `CONCEITO.md`: conceito do projeto
-- `FLUXOGRAMA_HARDWARE.md`: fluxo macro de hardware
-- `DEFINICOES_IOT.md`: glossario resumido de IoT
+- `PROVA04.ino`: firmware principal da prova com arquitetura explicita em `FreeRTOS`
+- `../fluxo-node-red.json`: dashboard base para o `Node-RED`
+- `../CONCEITO.md`: conceito do projeto
+- `../FLUXOGRAMA_HARDWARE.md`: fluxo macro de hardware
+- `../DEFINICOES_IOT.md`: glossario resumido de IoT
 
-## Hardware e Pinagem
-
-O kit continua sendo o mesmo da `Internet-of-Things/AULA08`.
+## Hardware e pinagem
 
 | Componente | Funcao | GPIO |
 | --- | --- | --- |
@@ -31,10 +29,10 @@ O kit continua sendo o mesmo da `Internet-of-Things/AULA08`.
 | `LED 2` | pausa ativa | `0` |
 | `LED 3` | Wi-Fi + MQTT ok | `2` |
 | `LED 4` | alerta ambiental | `15` |
-| `Botao 1` | iniciar ou alternar `FOCUS/PAUSE` | `4` |
-| `Botao 2` | reset para `IDLE` | `0` |
+| `Botao 1` | iniciar ou alternar `FOCO/PAUSA` | `4` |
+| `Botao 2` | reset para `OCIOSO` | `0` |
 | `Botao 3` | trocar exibicao local | `2` |
-| `Botao 4` | override manual da luminaria | `15` |
+| `Botao 4` | controle manual da luminaria | `15` |
 | `SEG_A` | display 7 segmentos | `18` |
 | `SEG_B` | display 7 segmentos | `5` |
 | `SEG_C` | display 7 segmentos | `21` |
@@ -43,106 +41,106 @@ O kit continua sendo o mesmo da `Internet-of-Things/AULA08`.
 | `SEG_F` | display 7 segmentos | `23` |
 | `SEG_G` | display 7 segmentos | `22` |
 | `SEG_DP` | display 7 segmentos | `19` |
-| `DISPLAY_1` | digito 1 | `16` |
-| `DISPLAY_2` | digito 2 | `17` |
+| `DIGITO_1` | digito 1 | `17` |
+| `DIGITO_2` | digito 2 | `16` |
 
 Observacao importante:
 
 - os GPIOs `4`, `0`, `2` e `15` continuam compartilhados entre `LEDs` e `botoes`;
-- por isso a `TaskControle` foi mantida como dona exclusiva desses pinos, reutilizando a estrategia de multiplexacao das aulas de IoT.
+- por isso a `tarefaControle` foi mantida como dona exclusiva desses pinos, reutilizando a estrategia de multiplexacao das aulas de IoT.
 
-## Arquitetura FreeRTOS Implementada
+## Arquitetura FreeRTOS implementada
 
-### Tasks
+### Tarefas
 
-| Task | Responsabilidade |
+| Tarefa | Responsabilidade |
 | --- | --- |
-| `TaskSensores` | acordada por timer, le `DHT11` e `LDR`, monta `SensorSnapshot` e envia para `qSensorSnapshots` |
-| `TaskControle` | le botoes, consome filas, atualiza `SystemState`, aplica regra da luminaria, controla rele e LEDs |
-| `TaskDisplay` | multiplexa o display de 7 segmentos continuamente |
-| `TaskIoT` | mantem `Wi-Fi`, `MQTT`, `HTTP`, publica status e recebe comandos remotos |
+| `tarefaSensores` | acordada por timer, le `DHT11` e `LDR`, monta `LeituraSensores` e envia para `qLeiturasSensores` |
+| `tarefaControle` | le botoes, consome filas, atualiza `EstadoSistema`, aplica regra da luminaria, controla rele e LEDs |
+| `tarefaDisplay` | multiplexa o display de 7 segmentos continuamente |
+| `tarefaIoT` | mantem `Wi-Fi`, `MQTT`, `HTTP`, publica estado e recebe comandos remotos |
 
 ### Primitivas do FreeRTOS
 
 | Recurso | Uso no projeto |
 | --- | --- |
-| `Queue` | `qSensorSnapshots` e `qControlCommands` |
-| `Mutex` | `mutexEstado` protege a struct `SystemState` |
+| `Queue` | `qLeiturasSensores` e `qComandosControle` |
+| `Mutex` | `mutexEstado` protege a struct `EstadoSistema` |
 | `Software Timer` | amostragem, tick do ciclo e publicacao MQTT |
-| `Event Group` | `BIT_WIFI_OK`, `BIT_MQTT_OK`, `BIT_FOCUS_ACTIVE`, `BIT_ALERT_ACTIVE` |
-| `Task Notification` | acorda `TaskSensores`, `TaskControle`, `TaskDisplay` e `TaskIoT` sem polling pesado |
+| `Event Group` | `BIT_WIFI_OK`, `BIT_MQTT_OK`, `BIT_FOCO_ATIVO`, `BIT_ALERTA_ATIVO` |
+| `Task Notification` | acorda `tarefaSensores`, `tarefaControle`, `tarefaDisplay` e `tarefaIoT` sem polling pesado |
 
 ### Tipos internos principais
 
-- `SensorSnapshot { temperatureC, humidityPercent, ldrRaw, ldrPercent, dhtOk, timestampMs }`
-- `ControlCommand { source, action, value, boolValue }`
-- `SystemState { mode, displayMode, relayOn, manualOverrideEnabled, manualOverrideState, thresholds, focusDurationSeconds, pauseDurationSeconds, countdownSeconds, connectivity, lastSensors }`
+- `LeituraSensores { temperaturaC, umidadePercentual, ldrBruto, ldrPercentual, dhtValido, instanteMs }`
+- `ComandoControle { origem, acao, valor, valorBooleano }`
+- `EstadoSistema { modo, modoExibicao, releLigado, controleManualAtivo, estadoControleManual, limiares, duracaoFocoSegundos, duracaoPausaSegundos, contagemRegressivaSegundos, conectividade, ultimaLeituraSensores }`
 
-## Comportamento Funcional
+## Comportamento funcional
 
 ### Modos
 
-- `IDLE`: sistema parado; o display mostra o modo selecionado pelo botao 3
-- `FOCUS`: cronometro ativo; se a luminosidade ficar abaixo do limiar, a luminaria liga automaticamente
-- `PAUSE`: cronometro de pausa ativo; a automacao da luz nao liga o rele
+- `OCIOSO`: sistema parado; o display mostra o modo de exibicao selecionado pelo botao 3
+- `FOCO`: cronometro ativo; se a luminosidade ficar abaixo do limiar, a luminaria liga automaticamente
+- `PAUSA`: cronometro de pausa ativo; a automacao da luz nao liga o rele
 
 ### Botoes locais
 
 | Botao | Acao |
 | --- | --- |
-| `Botao 1` | alterna entre `FOCUS` e `PAUSE`; se estiver em `IDLE`, entra em `FOCUS` |
-| `Botao 2` | reseta o sistema para `IDLE` e remove override manual |
+| `Botao 1` | alterna entre `FOCO` e `PAUSA`; se estiver em `OCIOSO`, entra em `FOCO` |
+| `Botao 2` | reseta o sistema para `OCIOSO` e remove o controle manual |
 | `Botao 3` | alterna a exibicao local entre `temperatura`, `umidade` e `luminosidade` |
-| `Botao 4` | ativa ou desativa o override manual da luminaria |
+| `Botao 4` | ativa ou desativa o controle manual da luminaria |
 
 ### Display
 
-- em `FOCUS` ou `PAUSE`, o display mostra o tempo restante;
+- em `FOCO` ou `PAUSA`, o display mostra o tempo restante;
 - com os tempos padrao de demonstracao, o valor e exibido em `segundos`;
 - se os tempos forem configurados acima de `99 s`, o display passa a mostrar `minutos`;
-- em `IDLE`, o display mostra `temperatura`, `umidade` ou `luminosidade`, de acordo com o ultimo modo escolhido no botao 3.
+- em `OCIOSO`, o display mostra `temperatura`, `umidade` ou `luminosidade`, de acordo com o ultimo modo escolhido no botao 3.
 
 ### Regra local da luminaria
 
-- se `manualOverrideEnabled = true`, o estado do rele segue o override manual;
-- caso contrario, a regra automatica vale somente em `FOCUS`;
-- a luminaria liga automaticamente quando `luminosidade < threshold` no modo `FOCUS`.
+- se `controleManualAtivo = true`, o estado do rele segue `estadoControleManual`;
+- caso contrario, a regra automatica vale somente em `FOCO`;
+- a luminaria liga automaticamente quando `luminosidade < limiar` no modo `FOCO`.
 
 ### Alertas ambientais
 
 O firmware considera:
 
-- `WARN` quando o `DHT11` nao esta valido;
-- `ALERT` quando `temperatura > 30 C` ou `umidade < threshold`;
+- `AVISO` quando o `DHT11` nao esta valido;
+- `ALERTA` quando `temperatura > 30 C` ou `umidade < limiar`;
 - `OK` nos demais casos.
 
-## Configuracao Padrao
+## Configuracao padrao
 
-Os parametros ficam centralizados no topo de `ESP32/PROVA04.ino`.
+Os parametros ficam centralizados no topo de `PROVA04.ino`.
 
 Valores iniciais:
 
-- `GROUP_ID = 7`
-- `limite de luminosidade = 40%`
-- `limite de umidade = 30%`
+- `ID_GRUPO = 7`
+- `limiar de luminosidade = 40%`
+- `limiar de umidade = 30%`
 - `temperatura de alerta = 30 C`
-- `FOCUS = 25 s`
-- `PAUSE = 5 s`
+- `FOCO = 25 s`
+- `PAUSA = 5 s`
 
 Os tempos curtos sao intencionais para demonstracao da prova sem alterar a arquitetura.
 
-## Interfaces de Comunicacao
+## Interfaces de comunicacao
 
 ### Topicos MQTT
 
 | Funcao | Topico |
 | --- | --- |
-| temperatura | `satc/gX/telemetry/temperature` |
-| umidade | `satc/gX/telemetry/humidity` |
-| luminosidade | `satc/gX/telemetry/luminosity` |
-| modo atual | `satc/gX/status/focus` |
-| alerta ambiental | `satc/gX/status/alert` |
-| comando da luminaria | `satc/gX/cmd/light` |
+| temperatura | `satc/gX/telemetria/temperatura` |
+| umidade | `satc/gX/telemetria/umidade` |
+| luminosidade | `satc/gX/telemetria/luminosidade` |
+| estado de foco | `satc/gX/estado/foco` |
+| alerta ambiental | `satc/gX/estado/alerta` |
+| comando da luminaria | `satc/gX/comando/luz` |
 
 Substitua `gX` pelo numero real do grupo antes da apresentacao.
 
@@ -151,42 +149,51 @@ Substitua `gX` pelo numero real do grupo antes da apresentacao.
 | Rota | Funcao |
 | --- | --- |
 | `/` | resumo humano do estado atual |
-| `/status` | JSON completo do `SystemState` |
-| `/config` | ajuste de `lux`, `humidity`, `focus` e `pause` |
+| `/estado` | JSON completo do `EstadoSistema` |
+| `/configuracao` | ajuste de `luminosidade`, `umidade`, `foco` e `pausa` |
 
 Exemplo:
 
 ```text
-/config?lux=45&humidity=35&focus=30&pause=10
+/configuracao?luminosidade=45&umidade=35&foco=30&pausa=10
 ```
 
-Observacao:
+### Payloads MQTT de comando
 
-- `focus` e `pause` sao configurados em `segundos`.
+- `LIGAR`
+- `DESLIGAR`
+
+## Conectividade Wi-Fi
+
+O firmware tenta:
+
+1. `Nicolas` como rede primaria comum;
+2. `SATC 2.4` como rede backup enterprise;
+3. novo ciclo sempre reiniciado pela rede primaria em caso de perda de conexao.
 
 ## Dashboard Node-RED
 
 Arquivo:
 
-- `fluxo-node-red.json`
+- `../fluxo-node-red.json`
 
 O fluxo inclui:
 
 - gauge de `temperatura`
 - gauge de `umidade`
 - grafico e texto de `luminosidade`
-- texto de `modo`
+- texto de `estado de foco`
 - texto de `alerta`
-- switch manual para comando `ON/OFF` da luminaria
-- a automacao da luminaria fica concentrada no `ESP32`, evitando republicar `cmd/light` a cada atualizacao de sensor ou status
+- switch manual para comando `LIGAR/DESLIGAR` da luminaria
+- automacao concentrada no `ESP32`, evitando republicar `comando/luz` a cada atualizacao de sensor ou status
 
-## Como Executar
+## Como executar
 
 ### 1. Preparar o firmware
 
-1. Abra `ESP32/PROVA04.ino`.
-2. Ajuste `EAP_IDENTITY`, `EAP_USERNAME` e `EAP_PASSWORD`.
-3. Troque `GROUP_ID` se o grupo nao for `7`.
+1. Abra `PROVA04.ino`.
+2. Ajuste `IDENTIDADE_EAP`, `USUARIO_EAP` e `SENHA_EAP`.
+3. Troque `ID_GRUPO` se o grupo nao for `7`.
 4. Confira as bibliotecas:
    - `WiFi.h`
    - `WiFiClientSecure.h`
@@ -199,21 +206,15 @@ O fluxo inclui:
 1. Selecione a placa ESP32 correta.
 2. Compile o sketch.
 3. Grave o firmware.
-4. Abra o monitor serial em `115200`.
-
-Observacao pratica:
-
-- a Arduino IDE e o `arduino-cli` esperam que o nome da pasta do sketch combine com o nome do arquivo `.ino` principal;
-- como a entrega foi organizada em `PROVA04/ESP32/PROVA04.ino`, a validacao de build foi feita a partir de uma copia temporaria em uma pasta `PROVA04`, sem alterar o codigo da entrega.
 
 Na inicializacao, o firmware deve:
 
-- criar `queues`, `mutex`, `timers` e `event group`;
-- iniciar as quatro `tasks`;
-- conectar ao `Wi-Fi Enterprise`;
+- criar filas, mutex, timers e `event group`;
+- iniciar as quatro tarefas;
+- tentar o Wi-Fi `Nicolas` e usar `SATC 2.4` como fallback;
 - subir o `HTTP WebServer`;
 - conectar ao `broker.hivemq.com:8883`;
-- assinar `satc/gX/cmd/light`.
+- assinar `satc/gX/comando/luz`.
 
 ### 3. Importar o Node-RED
 
@@ -228,52 +229,46 @@ Na inicializacao, o firmware deve:
 Com o ESP32 conectado, abra no navegador:
 
 - `http://IP_DO_ESP32/`
-- `http://IP_DO_ESP32/status`
-- `http://IP_DO_ESP32/config?lux=40&humidity=30&focus=25&pause=5`
+- `http://IP_DO_ESP32/estado`
+- `http://IP_DO_ESP32/configuracao?luminosidade=40&umidade=30&foco=25&pausa=5`
 
-## Roteiro de Validacao da Prova
+## Roteiro de validacao da prova
 
 ### FreeRTOS
 
-- confirmar que `TaskSensores`, `TaskControle`, `TaskDisplay` e `TaskIoT` estao ativas
-- confirmar uso explicito de `queue`, `mutex`, `software timers`, `event group` e `task notifications`
-- mostrar no codigo onde cada recurso e usado
+- confirmar que `tarefaSensores`, `tarefaControle`, `tarefaDisplay` e `tarefaIoT` estao ativas;
+- confirmar uso explicito de `queue`, `mutex`, `software timers`, `event group` e `task notifications`;
+- mostrar no codigo onde cada recurso e usado.
 
 ### Sensores e display
 
-- variar a luz no `LDR` e verificar mudanca no display e no dashboard
-- validar leitura de `temperatura` e `umidade`
-- trocar exibicao local com o botao 3
+- variar a luz no `LDR` e verificar mudanca no display e no dashboard;
+- validar leitura de `temperatura` e `umidade`;
+- trocar exibicao local com o botao 3.
 
 ### Ciclo de foco
 
-- botao 1: entrar em `FOCUS`
-- aguardar o fim do tempo e verificar troca automatica para `PAUSE`
-- aguardar novamente e verificar retorno para `FOCUS`
-- botao 2: reset para `IDLE`
+- botao 1: entrar em `FOCO`;
+- aguardar o fim do tempo e verificar troca automatica para `PAUSA`;
+- aguardar novamente e verificar retorno para `FOCO`;
+- botao 2: reset para `OCIOSO`.
 
 ### Luminaria
 
-- em `FOCUS` com baixa luminosidade, o rele deve ligar
-- fora de `FOCUS`, a regra automatica nao deve ligar o rele
-- botao 4 deve ativar e desativar override manual
-- `Node-RED` deve conseguir publicar `ON` e `OFF` em `satc/gX/cmd/light`
+- em `FOCO` com baixa luminosidade, o rele deve ligar;
+- fora de `FOCO`, a regra automatica nao deve ligar o rele;
+- botao 4 deve ativar e desativar o controle manual;
+- `Node-RED` deve conseguir publicar `LIGAR` e `DESLIGAR` em `satc/gX/comando/luz`.
 
 ### Conectividade
 
-- `BIT_WIFI_OK` deve subir quando o Wi-Fi conectar
-- `BIT_MQTT_OK` deve subir quando o broker conectar
-- `BIT_FOCUS_ACTIVE` deve refletir o modo `FOCUS`
-- `BIT_ALERT_ACTIVE` deve refletir `WARN` ou `ALERT`
+- `BIT_WIFI_OK` deve subir quando o Wi-Fi conectar;
+- `BIT_MQTT_OK` deve subir quando o broker conectar;
+- `BIT_FOCO_ATIVO` deve refletir o modo `FOCO`;
+- `BIT_ALERTA_ATIVO` deve refletir `AVISO` ou `ALERTA`.
 
 ### HTTP e MQTT
 
-- `/status` deve retornar JSON valido
-- `/config` deve alterar thresholds e duracoes
-- o dashboard deve mostrar os mesmos estados publicados pelo firmware
-
-## Observacoes Finais
-
-- a `AULA06` foi usada apenas como referencia de servico de rede; a prova continua baseada em `HTTP WebServer`, nao em `CoAP`
-- a estrategia de polling controlado para botoes foi escolhida de proposito, porque os pinos sao compartilhados com `LEDs`
-- a `Internet-of-Things/AULA08` foi mantida intacta; a `PROVA04` recebeu seu proprio sketch e seu proprio fluxo `Node-RED`
+- `/estado` deve retornar JSON valido;
+- `/configuracao` deve alterar limiares e duracoes;
+- o dashboard deve mostrar os mesmos estados publicados pelo firmware.
